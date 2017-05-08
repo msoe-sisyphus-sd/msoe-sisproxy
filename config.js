@@ -8,7 +8,6 @@ var config = {
         default_server: 'app',
         port_ssl: 443,
         port_redirect: 80,
-        neo4j: 'TlNpb20yYjB1MnNkbwo=',
         cert: function() {
             return {
                 key     : this.default_domain + "/privkey.pem",
@@ -31,10 +30,10 @@ var config = {
     sisyphus: {
         port_ssl: 443,
         port_redirect: 80,
-        default_domain: 'dev.withease.io',
+        default_domain: 'sisyphus.withease.io',
         folders: {},
         base_dir    : '/services',
-        base_certs  : '/services/sisproxy/certs/',
+        base_certs: '/etc/letsencrypt/live/',
         servers: function() {
             return {
                 app: {
