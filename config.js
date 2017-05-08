@@ -29,12 +29,12 @@ var config = {
         }
     },
     sisyphus: {
-        port_ssl: 3101,
-        port_redirect: 3000,
+        port_ssl: 443,
+        port_redirect: 80,
         default_domain: 'dev.withease.io',
         folders: {},
-        base_dir    : '/Users/kiefertravis/Documents/ease',
-        base_certs  : '/Users/kiefertravis/Documents/ease/proxy/certs/',
+        base_dir    : '/services',
+        base_certs  : '/services/sisproxy/certs/',
         servers: function() {
             return {
                 app: {
@@ -60,6 +60,14 @@ var config = {
                 }
             }
         }
+    },
+    travis: {
+        port_ssl: 3101,
+        port_redirect: 3000,
+        default_domain: 'dev.withease.io',
+        folders: {},
+        base_dir    : '/Users/kiefertravis/Documents/ease',
+        base_certs  : '/Users/kiefertravis/Documents/ease/sisproxy/certs/',
     },
 };
 
