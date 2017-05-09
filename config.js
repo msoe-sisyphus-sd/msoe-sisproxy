@@ -48,7 +48,7 @@ var config = {
 					sisbot: 'sisbot'
 				},
         base_dir    : '/home/pi/sisbot-server',
-        base_certs: '/home/pi/sisbot-server/certs',
+        base_certs: '/home/pi/sisbot-server/proxy/certs',
         servers: function() {
             return {
                 app: {
