@@ -2,47 +2,26 @@ var _ = require('underscore');
 
 var config = {
     base: {
-        base_dir: '/domains',
-        base_certs: '/etc/letsencrypt/live/',
-        default_domain: 'withease.io',
-        default_server: 'app',
-        port_ssl: 443,
-        port_redirect: 80,
-        cert: function() {
-            return {
-                key     : this.default_domain + "/privkey.pem",
-                cert    : this.default_domain + "/fullchain.pem"
-            }
-        },
-        folders: {
-            app: 'app',
-            api: 'api',
-            db: 'db',
-            hq: 'headquarters',
-            uploads: 'uploads',
-            www: 'www',
-            infosphere: 'infosphere'
-        },
-        services: function() {
-            return {}
-        }
-    },
-    sisyphus: {
+				include_https: true,
         port_ssl: 443,
         port_redirect: 80,
         default_domain: 'sisyphus.withease.io',
-        folders: {},
+        folders: {
+					cloud: 'siscloud',
+					api: 'sisapi',
+					sisbot: 'sisbot'
+				},
         base_dir    : '/services',
         base_certs: '/etc/letsencrypt/live/',
         servers: function() {
             return {
                 app: {
-                    dir: this.base_dir + '/siscloud',
+                    dir: this.base_dir + '/' + this.folders.cloud,
                     port: 3001,
                     has_server: true
                 },
                 api: {
-                    dir: this.base_dir + '/sisapi',
+                    dir: this.base_dir + '/' + this.folders.api,
                     port: 3005,
                     has_server: true
                 }
@@ -60,14 +39,60 @@ var config = {
             }
         }
     },
+		sisbot: {
+				include_https: false,
+        default_domain: 'sisbot.local',
+        folders: {
+					cloud: 'siscloud',
+					api: 'sisapi',
+					sisbot: 'sisbot'
+				},
+        base_dir    : '/home/pi/sisbot-server',
+        base_certs: '/home/pi/sisbot-server/certs',
+        servers: function() {
+            return {
+                app: {
+                    dir: this.base_dir + '/' + this.folders.cloud,
+                    port: 3001,
+                    has_server: true
+                },
+                sisbot: {
+                    dir: this.base_dir + '/' + this.folders.sisbot,
+                    port: 3002,
+                    has_server: true
+                }
+            }
+        },
+        services: function () {
+            return {
+                sisbot: {
+                    dir: this.base_dir + '/'+this.folders.sisbot,
+                    address: 'localhost',
+                    port: 3002,
+                    ansible_port: 8091,
+                    connect: []
+                }
+            }
+        }
+    },
     travis: {
         port_ssl: 3101,
         port_redirect: 3000,
         default_domain: 'dev.withease.io',
-        folders: {},
         base_dir    : '/Users/kiefertravis/Documents/ease',
         base_certs  : '/Users/kiefertravis/Documents/ease/sisproxy/certs/',
     },
+		matt: {
+      port_ssl: 3101,
+      port_redirect: 3000,
+      default_domain: 'dev.withease.io',
+      folders: {
+				cloud: 'cloud',
+				api: 'api'
+			},
+      base_dir    : '/Users/mattfox12/Documents/Sodo/Ease/Sisyphus',
+      base_certs  : '/Users/mattfox12/Documents/Sodo/Ease/Sisyphus/proxy/certs/',
+		}
 };
 
 var config_obj = config.base;
