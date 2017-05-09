@@ -64,16 +64,20 @@ if (config.include_https) {
 
 /****** REDIRECT SERVER ******/
 http.createServer(function (request, response) {
-    var domain_origin  = request.headers.host.replace(/\:[0-9]{4}/gi, '');
-		domain = domain_origin;
+  var domain_origin  = request.headers.host.replace(/\:[0-9]{4}/gi, '');
+	domain = domain_origin;
 
 	if (!config.servers[domain]) domain = domain_origin.substring(0,domain_origin.indexOf('.'));
-    if (!config.servers[domain]) domain = config.default_server;
-	// console.log("Request:", domain, config.servers[domain]);
+  if (!config.servers[domain]) domain = config.default_server;
+	console.log("Request:", domain, config.servers[domain]);
 
+	try {
     var active_port = config.servers[domain].port;
 
     proxy.web(request, response, { target: 'http://127.0.0.1:' + config.servers[domain].port, secure: false });
+	} catch (err) {
+		console.log("Redirect Err", err);
+	}
 }).listen(config.port_redirect);
 
 /******* SERVERS *************/
