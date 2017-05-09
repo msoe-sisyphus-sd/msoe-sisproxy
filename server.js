@@ -64,6 +64,7 @@ if (config.include_https) {
 
 /****** REDIRECT SERVER ******/
 http.createServer(function (request, response) {
+	console.log("Request:", request);
   var domain_origin  = request.headers.host.replace(/\:[0-9]{4}/gi, '');
 	domain = domain_origin;
 
