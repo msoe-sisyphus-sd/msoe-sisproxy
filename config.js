@@ -2,15 +2,15 @@ var _ = require('underscore');
 
 var config = {
     base: {
-				include_https: true,
+		include_https: true,
         port_ssl: 443,
         port_redirect: 80,
         default_domain: 'sisyphus.withease.io',
         folders: {
-					cloud: 'siscloud',
-					api: 'sisapi',
-					sisbot: 'sisbot'
-				},
+			cloud    : 'siscloud',
+			api      : 'sisapi',
+			sisbot   : 'sisbot'
+		},
         base_dir    : '/services',
         base_certs: '/etc/letsencrypt/live/',
         servers: function() {
@@ -39,16 +39,16 @@ var config = {
             }
         }
     },
-		sisbot: {
-				include_https: false,
+	sisbot: {
+		include_https: false,
         default_domain: 'sisbot.local',
         folders: {
-					cloud: 'siscloud',
-					api: 'sisapi',
-					sisbot: 'sisbot'
-				},
+			cloud: 'siscloud',
+			api: 'sisapi',
+			sisbot: 'sisbot'
+		},
         base_dir    : '/home/pi/sisbot-server',
-        base_certs: '/home/pi/sisbot-server/proxy/certs',
+        base_certs  : '/home/pi/sisbot-server/proxy/certs',
         servers: function() {
             return {
                 app: {
@@ -78,11 +78,11 @@ var config = {
     travis: {
         port_ssl: 3101,
         port_redirect: 3000,
-        default_domain: 'dev.withease.io',
+        default_domain: 'sisyphus.dev.withease.io',
         base_dir    : '/Users/kiefertravis/Documents/ease',
         base_certs  : '/Users/kiefertravis/Documents/ease/sisproxy/certs/',
     },
-		matt: {
+	matt: {
       port_ssl: 3101,
       port_redirect: 3000,
       default_domain: 'dev.withease.io',
@@ -92,7 +92,7 @@ var config = {
 			},
       base_dir    : '/Users/mattfox12/Documents/Sodo/Ease/Sisyphus',
       base_certs  : '/Users/mattfox12/Documents/Sodo/Ease/Sisyphus/proxy/certs/',
-		}
+	}
 };
 
 var config_obj = config.base;

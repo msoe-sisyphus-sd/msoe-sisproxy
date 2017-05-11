@@ -7,7 +7,7 @@ var express     = require('express');
 var bodyParser	= require('body-parser');
 var config      = require('./config.js');
 var _           = require('underscore');
-var ansible 		= require('./ansible.js');
+var ansible 	= require('./ansible.js');
 var used_ports  = [];
 
 /**************************** PROXY *******************************************/
@@ -65,19 +65,17 @@ if (config.include_https) {
 /****** REDIRECT SERVER ******/
 http.createServer(function (request, response) {
 	// console.log("Request:", request.url);
-  var domain_origin  = request.headers.host.replace(/\:[0-9]{4}/gi, '');
+    var domain_origin  = request.headers.host.replace(/\:[0-9]{4}/gi, '');
 	domain = domain_origin;
 
 	if (!config.servers[domain]) domain = domain_origin.substring(0,domain_origin.indexOf('.'));
-  if (!config.servers[domain]) domain = config.default_server;
-
+    if (!config.servers[domain]) domain = config.default_server;
 	if (domain == undefined) domain = request.url.split("/")[1];
 
 	// console.log("Request:", domain, config.servers[domain]);
 	try {
-    var active_port = config.servers[domain].port;
-
-    proxy.web(request, response, { target: 'http://127.0.0.1:' + config.servers[domain].port, secure: false });
+        var active_port = config.servers[domain].port;
+        proxy.web(request, response, { target: 'http://127.0.0.1:' + config.servers[domain].port, secure: false });
 	} catch (err) {
 		console.log("Redirect Err", err);
 	}
@@ -86,7 +84,7 @@ http.createServer(function (request, response) {
 /******* SERVERS *************/
 _.each(config.servers, function (domain) {
 	console.log("Setup server", domain.port, used_ports);
-  if (domain.has_server) {
+    if (domain.has_server) {
 		fs.stat(domain.dir + '/server.js',function(err,stats) {
 			if (err) {
 				console.log("Service not found:", domain);
