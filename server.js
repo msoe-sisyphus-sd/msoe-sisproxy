@@ -29,8 +29,6 @@ _.each(config.services, function (service) {
 /**************************** SERVERS *****************************************/
 
 function get_certificates(domain) {
-    console.log('WE HAVE REQ', domain);
-
     var certificates = {
         key : fs.readFileSync(config.base_certs + domain + '/privkey.pem'),
         cert: fs.readFileSync(config.base_certs + domain + '/fullchain.pem'),
@@ -45,7 +43,6 @@ if (config.include_https) {
 	    key     : fs.readFileSync(config.base_certs + config.default_domain + '/privkey.pem'),
 	    cert    : fs.readFileSync(config.base_certs + config.default_domain + '/fullchain.pem'),
 	    SNICallback: function(servername, cb) {
-            console.log('REQUEST', servername);
 	        var ctx = tls.createSecureContext(get_certificates(servername));
 	        cb(null, ctx);
 	    }
@@ -75,7 +72,6 @@ http.createServer(function (request, response) {
     if (!config.servers[domain]) domain = config.default_server;
 	if (domain == undefined) domain = request.url.split("/")[1];
 
-	// console.log("Request:", domain, config.servers[domain]);
 	try {
         var active_port = config.servers[domain].port;
         proxy.web(request, response, { target: 'http://127.0.0.1:' + config.servers[domain].port, secure: false });

@@ -20,6 +20,11 @@ var config = {
                     port: 3001,
                     has_server: true
                 },
+                siscloud: {
+                    dir: this.base_dir + '/' + this.folders.cloud,
+                    port: 3001,
+                    has_server: true
+                },
                 api: {
                     dir: this.base_dir + '/' + this.folders.api,
                     port: 3005,
