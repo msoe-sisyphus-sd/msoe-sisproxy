@@ -16,6 +16,11 @@ var proxy       = httpProxy.createServer();
 
 /**************************** SERVICES ****************************************/
 
+_.each(config.service_versions, function (version, service) {
+    var service_config  = require(config.base_dir + '/' + config.folders[service] + '/config.js');
+    config.service_versions[service] = service_config.version;
+});
+
 _.each(config.services, function (service) {
     if (service.address !== 'localhost')
         return this;

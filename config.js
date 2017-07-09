@@ -2,6 +2,7 @@ var _ = require('underscore');
 
 var config = {
     base: {
+        version: '0.5.1',
 		include_https: true,
         port_ssl: 443,
         port_redirect: 80,
@@ -9,10 +10,18 @@ var config = {
         folders: {
 			cloud    : 'siscloud',
 			api      : 'sisapi',
-			sisbot   : 'sisbot'
+			sisbot   : 'sisbot',
+            proxy    : 'proxy',
+            app      : 'siscloud'
 		},
-        base_dir    : '/services',
-        base_certs: '/etc/letsencrypt/live/',
+        base_dir            : '/services',
+        base_certs          : '/etc/letsencrypt/live/',
+        service_versions    : {
+            proxy       : '0.0.1',
+            app         : '0.0.1',
+            api         : '0.0.1',
+            sisbot      : '0.0.1',
+        },
         servers: function() {
             return {
                 app: {
@@ -35,7 +44,7 @@ var config = {
         services: function () {
             return {
                 api: {
-                    dir: this.base_dir + '/sisapi',
+                    dir: this.base_dir + '/' + this.folders.api,
                     address: 'localhost',
                     port: 3005,
                     ansible_port: 8092,
@@ -48,9 +57,10 @@ var config = {
 		include_https: false,
         default_domain: 'sisbot.local',
         folders: {
-			cloud: 'siscloud',
-			api: 'sisapi',
-			sisbot: 'sisbot'
+			cloud    : 'siscloud',
+			api      : 'sisapi',
+			sisbot   : 'sisbot',
+            proxy    : 'sisproxy',
 		},
         base_dir    : '/home/pi/sisbot-server',
         base_certs  : '/home/pi/sisbot-server/sisproxy/certs',
@@ -84,8 +94,15 @@ var config = {
         port_ssl: 3101,
         port_redirect: 3000,
         default_domain: 'sisyphus.dev.withease.io',
-        base_dir    : '/Users/kiefertravis/Documents/ease',
-        base_certs  : '/Users/kiefertravis/Documents/ease/sisproxy/certs/',
+        base_dir    : '/Users/kiefertravis/Documents/sisyphus',
+        base_certs  : '/Users/kiefertravis/Documents/sisyphus/proxy/certs/',
+        folders: {
+            cloud    : 'app',
+            api      : 'api',
+            sisbot   : 'sisbot',
+            proxy    : 'proxy',
+            app      : 'app'
+        },
     },
 	matt: {
       port_ssl: 3101,
