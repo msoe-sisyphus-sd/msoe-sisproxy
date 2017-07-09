@@ -11,7 +11,7 @@ var config = {
 			cloud    : 'siscloud',
 			api      : 'sisapi',
 			sisbot   : 'sisbot',
-            proxy    : 'proxy',
+            proxy    : 'sisproxy',
             app      : 'siscloud'
 		},
         base_dir            : '/services',
@@ -57,11 +57,16 @@ var config = {
 		include_https: false,
         default_domain: 'sisbot.local',
         folders: {
-			cloud    : 'siscloud',
-			api      : 'sisapi',
-			sisbot   : 'sisbot',
-            proxy    : 'sisproxy',
-		},
+            cloud       : 'siscloud',
+            sisbot      : 'sisbot',
+            proxy       : 'sisproxy',
+            app         : 'siscloud',
+        },
+        service_versions: {
+            proxy       : '0.0.1',
+            app         : '0.0.1',
+            sisbot      : '0.0.1',
+        },
         base_dir    : '/home/pi/sisbot-server',
         base_certs  : '/home/pi/sisbot-server/sisproxy/certs',
         servers: function() {
