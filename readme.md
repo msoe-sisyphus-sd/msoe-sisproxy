@@ -1,5 +1,13 @@
 # README
 
+## To Run Sisyphus
+
+- cd ~/sisbot-server/sisproxy/
+- sudo NODE_ENV=sisbot node server.js
+
+## Special Run modes (run within sisproxy folder)
+- sudo NODE_ENV=sisbot_stopped node server.js   (runs without autostarting any tracks)
+- sudo NODE_ENV=sisbot_dummy node server.js   (runs without connecting to Serial port: for testing web app, disconnected bots)
 
 ## Certificates
 
