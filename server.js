@@ -19,6 +19,12 @@ var proxy       = httpProxy.createServer();
 _.each(config.service_versions, function (version, service) {
     var service_config  = require(config.base_dir + '/' + config.folders[service] + '/config.js');
     config.service_versions[service] = service_config.version;
+		console.log("Check branch:", config.base_dir+'/'config.folders[service]);
+		exec('cd '+config.base_dir+'/'+config.folders[service]+' && git rev-parse --abbrev-ref HEAD', (error, stdout, stderr) => {
+			if (error) return console.error('exec error:',error);
+			console.log(service+" branch:", stdout);
+			config.service_branches[service] = stdout;
+		});
 });
 
 _.each(config.services, function (service) {
