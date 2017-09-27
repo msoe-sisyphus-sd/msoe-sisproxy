@@ -22,7 +22,6 @@ _.each(config.service_versions, function (version, service) {
     config.service_versions[service] = service_config.version;
 		exec('cd '+config.base_dir+'/'+config.folders[service]+' && git rev-parse --abbrev-ref HEAD', (error, stdout, stderr) => {
 			if (error) return console.error('exec error:',error);
-			console.log(service+" branch:", stdout.trim());
 			config.service_branches[service] = stdout.trim();
 		});
 });
