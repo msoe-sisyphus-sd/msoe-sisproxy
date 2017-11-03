@@ -2,7 +2,7 @@ var _ = require('underscore');
 
 var config = {
   base: {
-    version: '1.1.1b',
+    version: '1.1.2b',
     include_https: true,
     port_ssl: 443,
     port_redirect: 80,
@@ -116,12 +116,16 @@ var config = {
     },
   },
   matt: {
+	pi_serial: "0000000000000000",
     port_ssl: 3101,
     port_redirect: 3000,
     default_domain: 'dev.withease.io',
     folders: {
       cloud: 'cloud',
-      api: 'api'
+      api: 'api',
+      sisbot: 'sisbot',
+      proxy: 'proxy',
+      app: 'cloud'
     },
     base_dir: '/Users/mattfox12/Documents/Sodo/Ease/Sisyphus',
     base_certs: '/Users/mattfox12/Documents/Sodo/Ease/Sisyphus/proxy/certs/',

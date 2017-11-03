@@ -3,12 +3,12 @@ var http        = require('http');
 var tls         = require("tls");
 var fs          = require("fs");
 var httpProxy   = require('http-proxy');
-var exec 				= require('child_process').exec;
+var exec 		= require('child_process').execSync;
 var express     = require('express');
 var bodyParser	= require('body-parser');
 var config      = require('./config.js');
 var _           = require('underscore');
-var ansible 		= require('./ansible.js');
+var ansible 	= require('./ansible.js');
 var used_ports  = [];
 
 /**************************** PROXY *******************************************/
@@ -20,11 +20,11 @@ var proxy       = httpProxy.createServer();
 _.each(config.service_versions, function (version, service) {
     var service_config  = require(config.base_dir + '/' + config.folders[service] + '/config.js');
     config.service_versions[service] = service_config.version;
-		exec('cd '+config.base_dir+'/'+config.folders[service]+' && git rev-parse --abbrev-ref HEAD', (error, stdout, stderr) => {
-			if (error) return console.error('exec error:',error);
-			config.service_branches[service] = stdout.trim();
-		});
+	var command = 'cd '+config.base_dir+'/'+config.folders[service]+' && git rev-parse --abbrev-ref HEAD';
+	var resp = exec(command, {encoding:"utf8"});
+	config.service_branches[service] = resp.trim();
 });
+console.log(config.service_branches);
 
 _.each(config.services, function (service) {
     if (service.address !== 'localhost')
