@@ -31,12 +31,12 @@ var config = {
     servers: function() {
       return {
         // app: {
-        //   dir: this.base_dir + '/' + this.folders.cloud,
+        //   dir: this.base_dir + '/' + this.folders.app,
         //   port: 3001,
         //   has_server: true
         // },
         siscloud: {
-          dir: this.base_dir + '/' + this.folders.sisyphus_cloud,
+          dir: this.base_dir + '/' + this.folders.cloud,
           port: 3001,
           has_server: true
         },

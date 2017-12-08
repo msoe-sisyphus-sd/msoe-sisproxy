@@ -3,12 +3,12 @@ var http        = require('http');
 var tls         = require("tls");
 var fs          = require("fs");
 var httpProxy   = require('http-proxy');
-var exec 				= require('child_process').exec;
+var exec 		= require('child_process').exec;
 var express     = require('express');
 var bodyParser	= require('body-parser');
 var config      = require('./config.js');
 var _           = require('underscore');
-var ansible 		= require('./ansible.js');
+var ansible 	= require('./ansible.js');
 var used_ports  = [];
 
 /**************************** PROXY *******************************************/
@@ -92,15 +92,16 @@ http.createServer(function (request, response) {
 
 /******* SERVERS *************/
 _.each(config.servers, function (domain) {
-	console.log("Setup server", domain.port, used_ports);
+	console.log("Setup server", domain.port);
     if (domain.has_server) {
 		fs.stat(domain.dir + '/server.js',function(err,stats) {
 			if (err) {
 				console.log("Service not found:", domain);
 			} else if (used_ports.indexOf(domain.port) < 0) {
-	      var server = require(domain.dir + '/server.js');
+	      		var server = require(domain.dir + '/server.js');
 				server(domain);
 				used_ports.push(domain.port);
+				console.log("Used Ports", used_ports);
 			}
 		});
   } else if (used_ports.indexOf(domain.port) < 0) {
