@@ -2,13 +2,13 @@ var _ = require('underscore');
 
 var config = {
   base: {
-    version: '1.1.2b',
+    version: '1.1.3b', // logs location added
     include_https: true,
     port_ssl: 443,
     port_redirect: 80,
     default_domain: 'sisyphus.withease.io',
     folders: {
-      cloud: 'siscloud',
+      cloud: 'sisyphus_cloud',
       api: 'sisapi',
       sisbot: 'sisbot',
       proxy: 'sisproxy',
@@ -20,24 +20,24 @@ var config = {
       proxy: '0.0.1',
       app: '0.0.1',
       api: '0.0.1',
-      sisbot: '0.0.1',
+      sisbot: '0.0.1'
     },
     service_branches: { // assume master, is fetched on node start
       proxy: 'master',
       app: 'master',
       api: 'master',
-      sisbot: 'master',
+      sisbot: 'master'
     },
     servers: function() {
       return {
         app: {
-          dir: this.base_dir + '/' + this.folders.cloud,
+          dir: this.base_dir + '/' + this.folders.app,
           port: 3001,
           has_server: true
         },
         siscloud: {
           dir: this.base_dir + '/' + this.folders.cloud,
-          port: 3001,
+          port: 3002,
           has_server: true
         },
         api: {
@@ -63,10 +63,10 @@ var config = {
     include_https: false,
     default_domain: 'sisbot.local',
     folders: {
-      cloud: 'siscloud',
       sisbot: 'sisbot',
       proxy: 'sisproxy',
       app: 'siscloud',
+	  logs: '/var/log/sisyphus/'
     },
     service_versions: {
       proxy: '0.0.1',
@@ -78,7 +78,7 @@ var config = {
     servers: function() {
       return {
         app: {
-          dir: this.base_dir + '/' + this.folders.cloud,
+          dir: this.base_dir + '/' + this.folders.app,
           port: 3001,
           has_server: true
         },
@@ -121,11 +121,12 @@ var config = {
     port_redirect: 3000,
     default_domain: 'dev.withease.io',
     folders: {
-      cloud: 'cloud',
+      cloud: 'sisyphus_cloud',
       api: 'api',
       sisbot: 'sisbot',
       proxy: 'proxy',
-      app: 'cloud'
+      app: 'cloud',
+	  logs: '/Users/mattfox12/Documents/Sodo/Ease/Sisyphus/logs'
     },
     base_dir: '/Users/mattfox12/Documents/Sodo/Ease/Sisyphus',
     base_certs: '/Users/mattfox12/Documents/Sodo/Ease/Sisyphus/proxy/certs/',

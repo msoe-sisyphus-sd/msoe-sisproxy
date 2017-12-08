@@ -8,8 +8,41 @@ var express     = require('express');
 var bodyParser	= require('body-parser');
 var config      = require('./config.js');
 var _           = require('underscore');
+var moment 		= require('moment');
 var ansible 	= require('./ansible.js');
 var used_ports  = [];
+
+/* ---------------- Logging ------------- */
+// create folder for log files if not existing
+if (config.folders.logs) {
+	if (!fs.existsSync(config.folders.logs)) {
+		fs.mkdir(config.folders.logs, function(err, resp) {
+			// if (err) console.log("Error making log folder", err);
+		});
+	}
+}
+
+// TODO: check for default log file, would contain crash info
+
+
+var logEvent = function() {
+	var line = Date.now();
+	_.each(arguments, function(obj, index) {
+		if (_.isObject(obj)) line += "\t"+JSON.stringify(obj);
+		else line += "\t"+obj;
+	});
+
+	// save to the log file for sisbot
+	if (config.folders.logs) {
+		var filename = config.folders.logs + '/' + moment().format('YYYYMMDD') + '_proxy.log';
+
+		fs.appendFile(filename, line + '\n', function(err, resp) {
+		  if (err) console.log("Log err", err);
+		});
+	} else console.log(line);
+}
+
+logEvent(1, "Proxy Start");
 
 /**************************** PROXY *******************************************/
 
@@ -24,14 +57,14 @@ _.each(config.service_versions, function (version, service) {
 	var resp = exec(command, {encoding:"utf8"});
 	config.service_branches[service] = resp.trim();
 });
-console.log(config.service_branches);
+
+logEvent(1, config.service_branches);
 
 _.each(config.services, function (service) {
-    if (service.address !== 'localhost')
-        return this;
+    if (service.address !== 'localhost') return this;
 
     var service_obj = require(service.dir + '/server.js');
-		service_obj(config,ansible());
+	service_obj(config,ansible());
 
 	if (service.port != undefined) used_ports.push(service.port);
 });
@@ -58,45 +91,49 @@ if (config.include_https) {
 	    }
 	}, function(request, response) {
 	    var domain_origin  = request.headers.host.replace(/\:[0-9]{4}/gi, '');
-			domain = domain_origin;
+		domain = domain_origin;
+
+		console.log("Https Domain", domain);
 
 		if (!config.servers[domain]) domain = domain_origin.substring(0,domain_origin.indexOf('.'));
 	    if (!config.servers[domain]) domain = config.default_server;
-		// console.log("Request:", domain, config.servers[domain]);
+		logEvent(1, "Request:", domain, config.servers[domain]);
 
 	    var active_port = config.servers[domain].port;
 
 	    proxy.web(request, response, { target: 'http://127.0.0.1:' + config.servers[domain].port, secure: false, ws: true });
 	}).listen(config.port_ssl, function() {
-	    console.log("SSL Proxy listening on port " + config.port_ssl);
+	    logEvent(1, "SSL Proxy listening on port " + config.port_ssl);
 	});
 }
 
 /****** REDIRECT SERVER ******/
 http.createServer(function (request, response) {
-	// console.log("Request:", request.url);
     var domain_origin  = request.headers.host.replace(/\:[0-9]{4}/gi, '');
 	domain = domain_origin;
+
+	console.log("Domain", domain);
 
 	if (!config.servers[domain]) domain = domain_origin.substring(0,domain_origin.indexOf('.'));
     if (!config.servers[domain]) domain = config.default_server;
 	if (domain == undefined) domain = request.url.split("/")[1];
 
 	try {
+		logEvent(1, "Request:", request.url);
         var active_port = config.servers[domain].port;
         proxy.web(request, response, { target: 'http://127.0.0.1:' + config.servers[domain].port, secure: false });
 	} catch (err) {
-		console.log("Redirect Err", err);
+		logEvent(2, "Redirect Err", err);
 	}
 }).listen(config.port_redirect);
 
 /******* SERVERS *************/
 _.each(config.servers, function (domain) {
-	console.log("Setup server", domain.port, used_ports);
+	logEvent(1, "Setup server", domain.port, used_ports);
     if (domain.has_server) {
 		fs.stat(domain.dir + '/server.js',function(err,stats) {
 			if (err) {
-				console.log("Service not found:", domain);
+				logEvent(2, "Service not found:", domain);
 			} else if (used_ports.indexOf(domain.port) < 0) {
 	      var server = require(domain.dir + '/server.js');
 				server(domain);
@@ -110,7 +147,7 @@ _.each(config.servers, function (domain) {
 });
 
 function setup_static_server(domain) {
-  console.log("Static Server", domain);
+	logEvent(1, "Static Server", domain);
     var static             = new express();
 
     static.use(bodyParser.json());
