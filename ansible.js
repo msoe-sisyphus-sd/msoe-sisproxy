@@ -16,8 +16,8 @@ var Ansible = function() {
 		_port			: 443,
 		_is_receiver	: false,
 		_cert			: {
-			key: '/etc/ssl/private/privkey.pem',
-			cert: '/etc/ssl/private/fullchain.pem'
+			key: '/etc/ssl/private/private-key.pem',
+			cert: '/etc/ssl/private/public-cert.pem'
 		},
 		init: function(address,port,is_receiver) {
 			this._address = address;
@@ -194,12 +194,25 @@ var Ansible = function() {
 					console.log("Client disconnected from server", socket_obj.service);
 					if (socket_obj.messages.length > 0) console.log(socket_obj.messages.length+" unsent messages for "+service);
 
+					if (self.get(socket_obj.service).message_handler != null) {
+						if (_.isFunction(self.get(socket_obj.service).message_handler._connectionClosed)) {
+							self.get(socket_obj.service).message_handler._connectionClosed(socket_obj.service);
+						}
+					}
+
 					self.disconnect(socket_obj.service);
 				});
 				json_socket.on('message', function(message) {
 					message.service = socket_obj.service;
 
-					if (self.get(socket_obj.service).message_handler != null) {
+					if (message.method == "response" && message._id != undefined) {
+						try {
+							self._cb_hash[message._id].cb(message.err, message.data);
+							delete self._cb_hash[message.id];
+						} catch(err) {
+							return console.log("Response error", err);
+						}
+					} else if (self.get(socket_obj.service).message_handler != null) {
 						try {
 							if (self.debug) console.log(socket_obj.service+" Message", message);
 							self.get(socket_obj.service).message_handler[message.method](message.data, function(err, resp) {

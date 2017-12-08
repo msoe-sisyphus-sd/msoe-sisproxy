@@ -2,7 +2,7 @@ var _ = require('underscore');
 
 var config = {
   base: {
-    version: '0.5.5',
+    version: '0.5.6', // ansible update
     include_https: true,
     port_ssl: 443,
     port_redirect: 80,
