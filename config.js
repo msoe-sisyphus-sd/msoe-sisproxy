@@ -8,7 +8,7 @@ var config = {
     port_redirect: 80,
     default_domain: 'sisyphus.withease.io',
     folders: {
-      cloud: 'siscloud',
+      cloud: 'sisyphus_cloud',
       api: 'sisapi',
       sisbot: 'sisbot',
       proxy: 'sisproxy',
@@ -30,13 +30,13 @@ var config = {
     },
     servers: function() {
       return {
-        app: {
-          dir: this.base_dir + '/' + this.folders.cloud,
-          port: 3001,
-          has_server: true
-        },
+        // app: {
+        //   dir: this.base_dir + '/' + this.folders.cloud,
+        //   port: 3001,
+        //   has_server: true
+        // },
         siscloud: {
-          dir: this.base_dir + '/' + this.folders.cloud,
+          dir: this.base_dir + '/' + this.folders.sisyphus_cloud,
           port: 3001,
           has_server: true
         },
