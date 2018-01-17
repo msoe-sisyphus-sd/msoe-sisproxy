@@ -17,8 +17,18 @@ var used_ports  = [];
 if (config.folders.logs) {
 	if (!fs.existsSync(config.folders.logs)) {
 		fs.mkdir(config.folders.logs, function(err, resp) {
-			// if (err) console.log("Error making log folder", err);
+			if (err) logEvent(2, "Error making log folder", err);
 		});
+	}
+
+	// if proxy.log exists, and is not empty append to today's date
+	if (fs.existsSync(config.folders.logs+"proxy.log")) {
+		var file = fs.readFileSync(config.folders.logs+'proxy.log', 'utf8');
+		if (file) {
+			fs.appendFileSync(config.folders.logs + moment().format('YYYYMMDD') + "_proxy.log", fs.readFileSync(config.folders.logs+"proxy.log"));
+			// fs.unlinkSync(config.folders.logs+"/proxy.log");
+			fs.writeFileSync(config.folders.logs+'proxy.log', "");
+		}
 	}
 }
 
@@ -33,13 +43,7 @@ var logEvent = function() {
 	});
 
 	// save to the log file for sisbot
-	if (config.folders.logs) {
-		var filename = config.folders.logs + '/' + moment().format('YYYYMMDD') + '_proxy.log';
-
-		fs.appendFile(filename, line + '\n', function(err, resp) {
-		  if (err) console.log("Log err", err);
-		});
-	} else console.log(line);
+	console.log(line);
 }
 
 logEvent(1, "Proxy Start");
@@ -93,15 +97,19 @@ if (config.include_https) {
 	    var domain_origin  = request.headers.host.replace(/\:[0-9]{4}/gi, '');
 		domain = domain_origin;
 
-		console.log("Https Domain", domain);
+		logEvent(1, "Https Domain", domain);
 
 		if (!config.servers[domain]) domain = domain_origin.substring(0,domain_origin.indexOf('.'));
 	    if (!config.servers[domain]) domain = config.default_server;
-		logEvent(1, "Request:", domain, config.servers[domain]);
 
-	    var active_port = config.servers[domain].port;
+		try {
+			logEvent(1, "Request:", domain, config.servers[domain]);
+		    var active_port = config.servers[domain].port;
 
-	    proxy.web(request, response, { target: 'http://127.0.0.1:' + config.servers[domain].port, secure: false, ws: true });
+	    	proxy.web(request, response, { target: 'http://127.0.0.1:' + config.servers[domain].port, secure: false, ws: true });
+		} catch (err) {
+			logEvent(2, "Redirect Err", err);
+		}
 	}).listen(config.port_ssl, function() {
 	    logEvent(1, "SSL Proxy listening on port " + config.port_ssl);
 	});
@@ -112,7 +120,7 @@ http.createServer(function (request, response) {
     var domain_origin  = request.headers.host.replace(/\:[0-9]{4}/gi, '');
 	domain = domain_origin;
 
-	console.log("Domain", domain);
+	logEvent(1, "Domain", domain);
 
 	if (!config.servers[domain]) domain = domain_origin.substring(0,domain_origin.indexOf('.'));
     if (!config.servers[domain]) domain = config.default_server;

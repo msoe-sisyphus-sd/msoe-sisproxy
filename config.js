@@ -2,7 +2,7 @@ var _ = require('underscore');
 
 var config = {
   base: {
-    version: '1.1.3b', // logs location added
+    version: '1.1.3', // logs location added
     include_https: true,
     port_ssl: 443,
     port_redirect: 80,
@@ -96,6 +96,13 @@ var config = {
           address: 'localhost',
           port: 3002,
           ansible_port: 8091,
+          connect: ['api']
+	  	},
+        api: {
+          address: 'sisyphus.withease.io',
+          port: 3005,
+          ansible_port: 8092,
+		  is_register: true,
           connect: []
         }
       }
@@ -133,6 +140,9 @@ var config = {
   },
   debug: {
     debug: true
+  },
+  console: {
+    console: true
   }
 };
 
