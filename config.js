@@ -2,7 +2,7 @@ var _ = require('underscore');
 
 var config = {
   base: {
-    version: '1.1.3', // logs location added
+    version: '1.1.4', // ansible update
     include_https: true,
     port_ssl: 443,
     port_redirect: 80,

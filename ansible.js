@@ -79,7 +79,7 @@ var Ansible = function() {
 			var json_socket = new JsonSocket(socket);
 			json_socket.on('error',function(err){
 				if (self.get(service).is_connected) {
-				self.logEvent(2, "Ansible Error Socket: ", err);
+					self.logEvent(2, "Ansible Error Socket: ", err);
 					self.get(service).is_connected = false;
 
 					// check for _connectionError function in handler
@@ -117,7 +117,10 @@ var Ansible = function() {
 						self.connect(service, service_obj.address, service_obj.port, cb); // allows for address to be changed by handler
 					},5000);
 				} else {
-					self.disconnect(service);
+					self.logEvent(1, "Ansible disconnect", service, Object.keys(self.sockets).length);
+
+					// disconnect, forget socket
+					delete self.sockets[service];
 				}
 			});
 			json_socket.on('message',function(message) {
@@ -155,16 +158,16 @@ var Ansible = function() {
 			// save to list
 			if (this.sockets[service] == undefined) {
 				var socket_obj = {
-					socket:	json_socket,
-					service: service,
-					address: address,
-					port:						port,
-					is_connected:		false,
-					type:						"client",
-					messages:				[],
-					message_handler:	(self._handler) ? self._handler : null, // object to call functions when messages come in
-					maintain_conn:		true,
-					reconnect:				0
+					socket				: json_socket,
+					service				: service,
+					address				: address,
+					port				: port,
+					is_connected		: false,
+					type				: "client",
+					messages			: [],
+					message_handler		: (self._handler) ? self._handler : null, // object to call functions when messages come in
+					maintain_conn		: true,
+					reconnect			: 0
 				};
 				this.sockets[service] = socket_obj;
 			} else {
@@ -215,7 +218,7 @@ var Ansible = function() {
 						}
 					}
 
-					self.disconnect(socket_obj.service);
+					if (self.disconnect(socket_obj.service)) delete self.sockets[socket_obj.service];
 				});
 				json_socket.on('message', function(message) {
 					message.service = socket_obj.service;
@@ -266,12 +269,17 @@ var Ansible = function() {
 			return true;
 		},
 		disconnect: function(service) {
-			// disconnect, forget socket
-			delete this.sockets[service];
+			if (this.sockets[service] && this.sockets[service].is_connected) {
+				this.logEvent(1, "Ansible disconnect", Object.keys(this.get(service)));
 
-			this.logEvent(1, "Ansible disconnect", service, Object.keys(this.sockets).length);
+				this.get(service).maintain_conn = false; // don't try to reconnect
+				this.get_socket(service).end();
 
-			return true;
+				this.logEvent(1, "Ansible disconnect finished", service);
+				return true;
+			}
+
+			return false;
 		},
 		get: function(service) {
 			return this.sockets[service];
