@@ -19,6 +19,20 @@ var Ansible = function() {
 			key: '/etc/ssl/private/private-key.pem',
 			cert: '/etc/ssl/private/public-cert.pem'
 		},
+		logEvent: function() {
+			// var filename = '/var/log/sisyphus/ansible.log';
+
+			var line = Date.now();
+			_.each(arguments, function(obj, index) {
+				if (_.isObject(obj)) line += "\t"+JSON.stringify(obj);
+				else line += "\t"+obj;
+			});
+
+			console.log(line);
+			// fs.appendFile(filename, line + '\n', function(err, resp) {
+			//   if (err) console.log("Log err", err);
+			// });
+		},
 		init: function(address,port,is_receiver) {
 			this._address = address;
 			this._port = port;
@@ -57,7 +71,7 @@ var Ansible = function() {
 
 			var socket = tls.connect(port, address, options, function () {
 				self.get(service).is_connected = true;
-				// console.log(service + " Connected", self.get(service).is_connected);
+				// self.logEvent(1, service + " Connected", self.get(service).is_connected);
 				cb(null,true);
 			});
 
@@ -65,7 +79,7 @@ var Ansible = function() {
 			var json_socket = new JsonSocket(socket);
 			json_socket.on('error',function(err){
 				if (self.get(service).is_connected) {
-				console.log("Ansible Error Socket: ", err);
+					self.logEvent(2, "Ansible Error Socket: ", err);
 					self.get(service).is_connected = false;
 
 					// check for _connectionError function in handler
@@ -84,7 +98,7 @@ var Ansible = function() {
 				cb(err,null);
 			});
 			json_socket.on('close',function(){
-				console.log("Ansible Socket Closed:", service);
+				self.logEvent(1, "Ansible Socket Closed:", service);
 				var service_obj = self.get(service);
 				if (service_obj.is_connected) {
 					service_obj.is_connected = false;
@@ -103,20 +117,24 @@ var Ansible = function() {
 						self.connect(service, service_obj.address, service_obj.port, cb); // allows for address to be changed by handler
 					},5000);
 				} else {
-					self.disconnect(service);
+					self.logEvent(1, "Ansible disconnect", service, Object.keys(self.sockets).length);
+
+					// disconnect, forget socket
+					delete self.sockets[service];
 				}
 			});
 			json_socket.on('message',function(message) {
 				if (message.method == "response" && message._id != undefined) {
+					// self.logEvent(1, "CBs available", _.keys(self._cb_hash));
 					try {
 						self._cb_hash[message._id].cb(message.err, message.data);
-						delete self._cb_hash[message.id];
+						delete self._cb_hash[message._id];
 					} catch(err) {
-						return console.log("Response error", err);
+						return self.logEvent(2, "Outgoing Response error", message, err);
 					}
 				} else if (self.get(service).message_handler != null) {
 					try {
-						if (self.debug) console.log(service+" Message", message);
+						if (self.debug) self.logEvent(1, service+" Message", message);
 						self.get(service).message_handler[message.method](message.data, function(err, resp) {
 							if (message._id != undefined) {
 								var response = { service: service, data: resp, err: err, _id: message._id };
@@ -124,7 +142,7 @@ var Ansible = function() {
 							}
 						});
 					} catch(err) {
-						return console.log("Handler error", err);
+						return self.logEvent(2, "Outgoing Handler error", message, err);
 					}
 				}
 				// call any listener method saved
@@ -132,7 +150,7 @@ var Ansible = function() {
 					try {
 						self._listeners[message.method](message, json_socket);
 					} catch(err) {
-						return console.log("Message error",err);
+						return self.logEvent(2, "Outgoing Message error",err);
 					}
 				}
 			});
@@ -140,16 +158,16 @@ var Ansible = function() {
 			// save to list
 			if (this.sockets[service] == undefined) {
 				var socket_obj = {
-					socket:	json_socket,
-					service: service,
-					address: address,
-					port:						port,
-					is_connected:		false,
-					type:						"client",
-					messages:				[],
-					message_handler:	(self._handler) ? self._handler : null, // object to call functions when messages come in
-					maintain_conn:		true,
-					reconnect:				0
+					socket				: json_socket,
+					service				: service,
+					address				: address,
+					port				: port,
+					is_connected		: false,
+					type				: "client",
+					messages			: [],
+					message_handler		: (self._handler) ? self._handler : null, // object to call functions when messages come in
+					maintain_conn		: true,
+					reconnect			: 0
 				};
 				this.sockets[service] = socket_obj;
 			} else {
@@ -165,14 +183,14 @@ var Ansible = function() {
 		},
 		serve: function() {
 			var self = this;
-			if (self.debug) console.log("Start Ansible Server", this._port, options);
+			if (self.debug) self.logEvent(1, "Start Ansible Server", this._port, options);
 			var options = {
 				key: fs.readFileSync(this._cert.key),
 				cert: fs.readFileSync(this._cert.cert)
 			};
 			this.server = tls.createServer(options,function(socket) {
 				socket.on('error', function(err) {
-					console.log("Ansible Server error", err);
+					self.logEvent(2, "Ansible Server error", err);
 				});
 
 				var json_socket = new JsonSocket(socket);
@@ -188,11 +206,11 @@ var Ansible = function() {
 					message_handler:	(self._handler) ? self._handler : null // object to call functions when messages come in
 				};
 				self.sockets[socket_obj.service] = socket_obj;
-				console.log("Client connected", socket_obj.service);
+				self.logEvent(1, "Client connected", socket_obj.service);
 
 				json_socket.on('close', function() {
-					console.log("Client disconnected from server", socket_obj.service);
-					if (socket_obj.messages.length > 0) console.log(socket_obj.messages.length+" unsent messages for "+service);
+					self.logEvent(1, "Client disconnected from server", socket_obj.service);
+					if (socket_obj.messages.length > 0) self.logEvent(1, socket_obj.messages.length+" unsent messages for "+service);
 
 					if (self.get(socket_obj.service).message_handler != null) {
 						if (_.isFunction(self.get(socket_obj.service).message_handler._connectionClosed)) {
@@ -200,7 +218,7 @@ var Ansible = function() {
 						}
 					}
 
-					self.disconnect(socket_obj.service);
+					if (self.disconnect(socket_obj.service)) delete self.sockets[socket_obj.service];
 				});
 				json_socket.on('message', function(message) {
 					message.service = socket_obj.service;
@@ -208,13 +226,13 @@ var Ansible = function() {
 					if (message.method == "response" && message._id != undefined) {
 						try {
 							self._cb_hash[message._id].cb(message.err, message.data);
-							delete self._cb_hash[message.id];
+							delete self._cb_hash[message._id];
 						} catch(err) {
-							return console.log("Response error", err);
+							return self.logEvent(2, "Response error", err);
 						}
 					} else if (self.get(socket_obj.service).message_handler != null) {
 						try {
-							if (self.debug) console.log(socket_obj.service+" Message", message);
+							if (self.debug) self.logEvent(1, socket_obj.service+" Message", message);
 							self.get(socket_obj.service).message_handler[message.method](message.data, function(err, resp) {
 								if (message._id != undefined) {
 									var response = { service: socket_obj.service, data: resp, err: err, _id: message._id };
@@ -222,7 +240,7 @@ var Ansible = function() {
 								}
 							});
 						} catch(err) {
-							return console.log("Handler error", err);
+							return self.logEvent(2, "Handler error", err);
 						}
 					}
 
@@ -230,7 +248,7 @@ var Ansible = function() {
 						try {
 							self._listeners[message.method](message, json_socket);
 						} catch(err) {
-							return console.log("Message error",err);
+							return self.logEvent(2, "Message error",err);
 						}
 					}
 				});
@@ -238,7 +256,7 @@ var Ansible = function() {
 		},
 		stop_server: function(service) {
 			var self = this;
-			console.log("Ansible stop server", service);
+			this.logEvent(1, "Ansible stop server", service);
 			// remove all connected sockets?
 			var clientList = this.sockets;
 			_.each(clientList, function(client) {
@@ -251,12 +269,17 @@ var Ansible = function() {
 			return true;
 		},
 		disconnect: function(service) {
-			// disconnect, forget socket
-			delete this.sockets[service];
+			if (this.sockets[service] && this.sockets[service].is_connected) {
+				this.logEvent(1, "Ansible disconnect", Object.keys(this.get(service)));
 
-			console.log("Ansible disconnect", service, Object.keys(this.sockets).length);
+				this.get(service).maintain_conn = false; // don't try to reconnect
+				this.get_socket(service).end();
 
-			return true;
+				this.logEvent(1, "Ansible disconnect finished", service);
+				return true;
+			}
+
+			return false;
 		},
 		get: function(service) {
 			return this.sockets[service];
@@ -278,7 +301,7 @@ var Ansible = function() {
 				this._listeners[method] = cb;
 				return this;
 			} catch (err) {
-				return console.log("Listen to error", err);
+				return this.logEvent(2, "Listen to error", err);
 			}
 		},
 		// ----- unused function, will be handled by setting this._handler before any connections come in ----- //
@@ -290,25 +313,25 @@ var Ansible = function() {
 		},
 		request: function(obj) {
 			// obj { service: "label", data: {}, method: "name", cb: func() }
-			if (this.get(obj.service) == undefined) return console.log("Service "+obj.service+" not available", obj);
+			if (this.get(obj.service) == undefined) return this.logEvent(2, "Service "+obj.service+" not available", obj);
 
 			var socket = this.get(obj.service).socket;
-			if (socket == undefined) return console.log("No "+obj.service+" socket available", null);
+			if (socket == undefined) return this.logEvent(2, "No "+obj.service+" socket available", null);
 
 			// save cb for response whenever it comes back
 			if (obj.cb != undefined && _.isFunction(obj.cb)) {
-				if (this.debug) console.log("CB: ", obj.cb);
+				if (this.debug) this.logEvent(1, "CB: ", obj.cb);
 				var _id = uuid();
 				this._cb_hash[_id] = { cb: obj.cb, timestamp: Date.now() };
 				obj._id = _id;
 			}
 
-			// console.log("Request", obj, this.get(obj.service));
+			// this.logEvent(1, "Request", obj, this.get(obj.service));
 			if (this.get(obj.service).is_connected == true) {
-				// console.log("Request", obj);
+				// this.logEvent(1, "Request", obj);
 				socket.sendMessage(obj);
 			} else {
-				console.log("Message Saved", obj);
+				this.logEvent(1, "Message Saved", obj);
 				this.get(obj.service).messages.push(obj);
 			}
 		},

@@ -2,7 +2,7 @@ var _ = require('underscore');
 
 var config = {
   base: {
-    version: '0.5.6', // ansible update
+    version: '1.1.4', // ansible update
     include_https: true,
     port_ssl: 443,
     port_redirect: 80,
@@ -20,24 +20,32 @@ var config = {
       proxy: '0.0.1',
       app: '0.0.1',
       api: '0.0.1',
-      sisbot: '0.0.1',
+      sisbot: '0.0.1'
     },
     service_branches: { // assume master, is fetched on node start
       proxy: 'master',
       app: 'master',
       api: 'master',
-      sisbot: 'master',
+      sisbot: 'master'
     },
     servers: function() {
       return {
+<<<<<<< HEAD
         // app: {
         //   dir: this.base_dir + '/' + this.folders.app,
         //   port: 3001,
         //   has_server: true
         // },
+=======
+        app: {
+          dir: this.base_dir + '/' + this.folders.app,
+          port: 3001,
+          has_server: true
+        },
+>>>>>>> beta
         siscloud: {
           dir: this.base_dir + '/' + this.folders.cloud,
-          port: 3001,
+          port: 3002,
           has_server: true
         },
         api: {
@@ -63,10 +71,10 @@ var config = {
     include_https: false,
     default_domain: 'sisbot.local',
     folders: {
-      cloud: 'siscloud',
       sisbot: 'sisbot',
       proxy: 'sisproxy',
       app: 'siscloud',
+	  logs: '/var/log/sisyphus/'
     },
     service_versions: {
       proxy: '0.0.1',
@@ -78,7 +86,7 @@ var config = {
     servers: function() {
       return {
         app: {
-          dir: this.base_dir + '/' + this.folders.cloud,
+          dir: this.base_dir + '/' + this.folders.app,
           port: 3001,
           has_server: true
         },
@@ -96,6 +104,13 @@ var config = {
           address: 'localhost',
           port: 3002,
           ansible_port: 8091,
+          connect: ['api']
+	  	},
+        api: {
+          address: 'sisyphus.withease.io',
+          port: 3005,
+          ansible_port: 8092,
+		  is_register: true,
           connect: []
         }
       }
@@ -116,18 +131,26 @@ var config = {
     },
   },
   matt: {
+	pi_serial: "0000000000000000",
     port_ssl: 3101,
     port_redirect: 3000,
     default_domain: 'dev.withease.io',
     folders: {
-      cloud: 'cloud',
-      api: 'api'
+      cloud: 'sisyphus_cloud',
+      api: 'api',
+      sisbot: 'sisbot',
+      proxy: 'proxy',
+      app: 'cloud',
+	  logs: '/Users/mattfox12/Documents/Sodo/Ease/Sisyphus/logs'
     },
     base_dir: '/Users/mattfox12/Documents/Sodo/Ease/Sisyphus',
     base_certs: '/Users/mattfox12/Documents/Sodo/Ease/Sisyphus/proxy/certs/',
   },
   debug: {
     debug: true
+  },
+  console: {
+    console: true
   }
 };
 
