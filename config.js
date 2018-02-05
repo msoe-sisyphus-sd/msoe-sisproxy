@@ -30,19 +30,11 @@ var config = {
     },
     servers: function() {
       return {
-<<<<<<< HEAD
-        // app: {
-        //   dir: this.base_dir + '/' + this.folders.app,
-        //   port: 3001,
-        //   has_server: true
-        // },
-=======
         app: {
           dir: this.base_dir + '/' + this.folders.app,
           port: 3001,
           has_server: true
         },
->>>>>>> beta
         siscloud: {
           dir: this.base_dir + '/' + this.folders.cloud,
           port: 3002,
