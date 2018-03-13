@@ -2,7 +2,7 @@ var _ = require('underscore');
 
 var config = {
   base: {
-    version: '1.3.0', // 1.3.0 Fix for proxy able to revert on bad update
+    version: '1.3.1', // 1.3.1 Proxy bugfix
     include_https: true,
     port_ssl: 443,
     port_redirect: 80,

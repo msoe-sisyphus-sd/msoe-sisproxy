@@ -242,8 +242,7 @@ if (config.include_https) {
 			logEvent(1, "Request:", domain, config.services[domain]);
 		    var active_port = config.services[domain].port;
 
-			if (config.services[domain].has_server)
-	    		proxy.web(request, response, { target: 'http://127.0.0.1:' + config.services[domain].port, secure: false, ws: true });
+			proxy.web(request, response, { target: 'http://127.0.0.1:' + config.services[domain].port, secure: false, ws: true });
 		} catch (err) {
 			logEvent(2, "Redirect Err", err);
 		}
@@ -267,8 +266,7 @@ http.createServer(function (request, response) {
 		logEvent(1, "Request:", request.url);
         var active_port = config.services[domain].port;
 
-		if (config.services[domain].has_server)
-        	proxy.web(request, response, { target: 'http://127.0.0.1:' + config.services[domain].port, secure: false });
+    	proxy.web(request, response, { target: 'http://127.0.0.1:' + config.services[domain].port, secure: false });
 	} catch (err) {
 		logEvent(2, "Redirect Err", err);
 	}
