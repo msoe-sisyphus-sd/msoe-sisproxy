@@ -2,7 +2,7 @@ var _ = require('underscore');
 
 var config = {
   base: {
-    version: '1.2.0', // 1.2.0 Rollout
+    version: '1.3.0', // 1.3.0 Fix for proxy able to revert on bad update
     include_https: true,
     port_ssl: 443,
     port_redirect: 80,
@@ -91,6 +91,12 @@ var config = {
     },
     services: function() {
       return {
+        app: {
+          dir: this.base_dir + '/' + this.folders.app,
+          address: 'localhost',
+          port: 3001,
+          has_server: true
+	  	},
         sisbot: {
           dir: this.base_dir + '/' + this.folders.sisbot,
           address: 'localhost',
