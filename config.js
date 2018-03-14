@@ -2,7 +2,7 @@ var _ = require('underscore');
 
 var config = {
   base: {
-    version: '1.3.1', // 1.3.1 Proxy bugfix
+    version: '1.3.2', // 1.3.2 Config.js crash fix
     include_https: true,
     port_ssl: 443,
     port_redirect: 80,
