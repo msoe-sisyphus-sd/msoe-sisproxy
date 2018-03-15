@@ -261,14 +261,14 @@ http.createServer(function (request, response) {
     var domain_origin  = request.headers.host.replace(/\:[0-9]{4}/gi, '');
 	domain = domain_origin;
 
-	logEvent(1, "Domain", domain);
+	// logEvent(1, "Domain", domain);
 
 	if (!config.services[domain]) domain = domain_origin.substring(0,domain_origin.indexOf('.'));
     if (!config.services[domain]) domain = config.default_server;
 	if (domain == undefined) domain = request.url.split("/")[1];
 
 	try {
-		logEvent(1, "Request:", request.url);
+		if (request.url != '/sisbot/state') logEvent(1, "Request:", request.url);
         var active_port = config.services[domain].port;
 
     	proxy.web(request, response, { target: 'http://127.0.0.1:' + config.services[domain].port, secure: false });
