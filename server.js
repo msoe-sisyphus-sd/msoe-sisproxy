@@ -60,12 +60,12 @@ var proxy       = httpProxy.createServer();
 var state = {
 	sisbot: {
 		npm_restart: false,
-		git_stable: '50408c986a2aafeca7224b93df1cfeba155a1d63',
+		git_stable: '',
 		running: false
 	},
 	app: {
 		npm_restart: false,
-		git_stable: '1cc366b8a246aedfebebcbe3208576cbd5b6fdb9',
+		git_stable: '',
 		running: false
 	}
 };
