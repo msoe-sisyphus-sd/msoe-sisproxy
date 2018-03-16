@@ -11,6 +11,10 @@ sudo kill -9 $nodepid
 done
 
 # remove status
+cd /home/pi/sisbot-server/sisproxy/
+rm state.json
+
+# remove status
 cd /home/pi/sisbot-server/sisbot/content/
 rm status.json
 
