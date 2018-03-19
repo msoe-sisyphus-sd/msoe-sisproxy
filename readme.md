@@ -1,5 +1,10 @@
 # README
 
+## Bluetooth
+- sudo apt-get install bluetooth bluez libbluetooth-dev libudev-dev
+- npm install bleno
+-
+
 ## To Run Sisyphus
 
 - cd ~/sisbot-server/sisproxy/
@@ -36,9 +41,11 @@
 - openssl x509 -req -days 3650 -in <name>.csr -signkey <name>.key -out <name>.crt
 
 ## Helpful Commands
-sudo lsof -i -P | grep node | wc -l // node processes with ports open
+- sudo lsof -i -P | grep node | wc -l // node processes with ports open
+- pkill -f node
 - shell script you put on deploy. Tell stations to update in the binary. If exec.sh file, it will run that file
 - git.withease.io
+- sudo killall node will kill all active node processes
 
 ## New Git Repos
 
