@@ -57,18 +57,14 @@ var proxy       = httpProxy.createServer();
 /**************************** SERVICES ****************************************/
 
 // load state.json
-var state = {
-	sisbot: {
+var state = {};
+_.each(config.services, function(service, key) {
+	state[key] = {
 		npm_restart: false,
 		git_stable: '',
 		running: false
-	},
-	app: {
-		npm_restart: false,
-		git_stable: '',
-		running: false
-	}
-};
+	};
+});
 
 if (fs.existsSync(config.base_dir+'/'+config.folders.proxy+'/state.json')) {
 	//logEvent(1, "Load saved state:", config.base_dir+'/state.json');
@@ -151,9 +147,12 @@ function create_service(service,cb) {
 }
 
 function save_services_state() {
+	if (process.env.NODE_ENV.indexOf('sisbot') < 0) return; // skip
+
 	var sanitized_state = JSON.parse(JSON.stringify(state));
-	delete sanitized_state.sisbot.running;
-	delete sanitized_state.app.running;
+	_.each(sanitized_state, function(obj, key) {
+		delete sanitized_state[key].running;
+	});
 
 	// write to file
 	try {
@@ -165,6 +164,8 @@ function save_services_state() {
 }
 
 function git_state() {
+	if (process.env.NODE_ENV.indexOf('sisbot') < 0) return; // skip
+
 	if (state.sisbot.running && state.app.running) {
 		// console.log("Git State", state.sisbot.running, state.app.running);
 		exec('cd '+config.base_dir+'/sisbot && git log -1 --stat', (error, stdout, stderr) => {
@@ -205,6 +206,8 @@ function restart_node() {
 }
 
 function revert_reset() {
+	if (process.env.NODE_ENV.indexOf('sisbot') < 0) return; // skip
+
 	var ls = spawn('./revert_reset.sh',[state.sisbot.git_stable, state.app.git_stable],{cwd:config.base_dir+'/'+config.folders.proxy,detached:true,stdio:'ignore'});
 	ls.on('error', (err) => {
 	  logEvent(2, 'Failed to start child process.');
