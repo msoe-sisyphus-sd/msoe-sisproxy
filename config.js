@@ -49,6 +49,12 @@ var config = {
         },
         services: function() {
             return {
+                app: {
+                    dir: this.base_dir + '/' + this.folders.app,
+                    address: 'localhost',
+                    port: 3001,
+                    connect: []
+                },
                 api: {
                     dir: this.base_dir + '/' + this.folders.api,
                     address: 'localhost',
