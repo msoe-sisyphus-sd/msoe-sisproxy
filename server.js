@@ -97,10 +97,12 @@ _.each(config.services, function (service, key) {
     if (service.address !== 'localhost') return this;
 
 	// fix for sisbot 1.2.0
-	if (key == 'sisbot') {
-		if (config.service_versions[key] == '1.2.0') {
+	if (key == 'sisbot' && config.service_versions[key] == '1.2.0') {
+		try {
 			var command = 'cd '+config.base_dir+'/'+config.folders[key]+' && git reset --hard 5ef3122cd036a8e052fc762cdb84533596823dfc';
 			var resp = execSync(command, {encoding:"utf8"});
+		} catch(err) {
+			logEvent(2, "1.2.0 fix error", err);
 		}
 	}
 
