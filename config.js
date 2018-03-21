@@ -2,7 +2,7 @@ var _ = require('underscore');
 
 var config = {
     base: {
-        version: '1.2.1', // 1.2.1 Auto-recovery
+        version: '1.3.0', // Fix for mismatched 1.2.0 repo
         include_https: true,
         port_ssl: 443,
         port_redirect: 80,
