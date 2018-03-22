@@ -96,6 +96,19 @@ logEvent(1, config.service_branches);
 _.each(config.services, function (service, key) {
     if (service.address !== 'localhost') return this;
 
+	// fix for sisbot 1.2.0
+	try {
+		if (key == 'sisbot' && config.service_versions[key] == '1.2.0') {
+			var command = 'cd '+config.base_dir+'/'+config.folders[key]+' && git reset --hard 5ef3122cd036a8e052fc762cdb84533596823dfc && git pull origin master';
+			var resp = execSync(command, {encoding:"utf8"});
+
+			// Restart self
+			restart_node();
+		}
+	} catch(err) {
+		logEvent(2, "1.2.0 fix error", err);
+	}
+
 	create_service(service, function(err, resp) {
 		if (err) {
 			if (!state[key].npm_restart) {

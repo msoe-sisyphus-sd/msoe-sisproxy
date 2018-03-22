@@ -2,7 +2,7 @@ var _ = require('underscore');
 
 var config = {
     base: {
-        version: '1.2.1', // 1.2.1 Auto-recovery
+        version: '1.2.2', // 1.2.2 Sisbot 1.2.0 merge fix
         include_https: true,
         port_ssl: 443,
         port_redirect: 80,
