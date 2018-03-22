@@ -99,7 +99,7 @@ _.each(config.services, function (service, key) {
 	// fix for sisbot 1.2.0
 	try {
 		if (key == 'sisbot' && config.service_versions[key] == '1.2.0') {
-			var command = 'cd '+config.base_dir+'/'+config.folders[key]+' && git reset --hard 5ef3122cd036a8e052fc762cdb84533596823dfc && git pull origin master';
+			var command = 'cd '+config.base_dir+'/'+config.folders[key]+' && git config --global user.name Sisyphus && git config --global user.email pi@sisyphus-industries.com && git reset --hard 5ef3122cd036a8e052fc762cdb84533596823dfc && git pull origin master';
 			var resp = execSync(command, {encoding:"utf8"});
 
 			// Restart self
