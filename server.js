@@ -99,8 +99,8 @@ _.each(config.services, function (service, key) {
 	// fix for sisbot 1.2.0
 	try {
 		if (key == 'sisbot' && config.service_versions[key] == '1.2.0') {
-			var command = 'cd '+config.base_dir+'/'+config.folders[key]+' && git config --global user.name Sisyphus && git config --global user.email pi@sisyphus-industries.com && git reset --hard a7438e8e6a48138e521bbf328d9e259116aad2e6 && git pull origin master';
-			var resp = execSync(command, {encoding:"utf8"});
+			logEvent(1, "1.2.0 fix");
+			var resp = execSync('./sisbot_1_2_0_fix.sh', {encoding:"utf8"});
 
 			// Restart self
 			restart_node();
@@ -211,6 +211,7 @@ function git_state() {
 }
 
 function restart_node() {
+	logEvent(1, "Restart Node");
 	var ls = spawn('./restart.sh',[],{cwd:config.base_dir+'/'+config.folders.proxy,detached:true,stdio:'ignore'});
 	ls.on('error', (err) => {
 	  logEvent(2, 'Failed to start child process.');
@@ -223,6 +224,7 @@ function restart_node() {
 function revert_reset() {
 	if (process.env.NODE_ENV.indexOf('sisbot') < 0) return; // skip
 
+	logEvent(1, "Revert Reset", "Sisbot", state.sisbot.git_stable, "Siscloud", state.app.git_stable);
 	var ls = spawn('./revert_reset.sh',[state.sisbot.git_stable, state.app.git_stable],{cwd:config.base_dir+'/'+config.folders.proxy,detached:true,stdio:'ignore'});
 	ls.on('error', (err) => {
 	  logEvent(2, 'Failed to start child process.');

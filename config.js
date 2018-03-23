@@ -2,7 +2,7 @@ var _ = require('underscore');
 
 var config = {
     base: {
-        version: '1.3.1', // Logging changes
+        version: '1.3.2', // Another 1.2.0 fix attempt
         include_https: true,
         port_ssl: 443,
         port_redirect: 80,
