@@ -91,7 +91,7 @@ _.each(config.service_versions, function (version, service) {
 	}
 });
 
-logEvent(1, config.service_branches);
+logEvent(1, "Services", config.service_branches, config.service_versions);
 
 _.each(config.services, function (service, key) {
     if (service.address !== 'localhost') return this;
@@ -112,6 +112,8 @@ _.each(config.services, function (service, key) {
 	create_service(service, function(err, resp) {
 		if (err) {
 			if (!state[key].npm_restart) {
+				logEvent(2, "NPM Restart");
+				
 				// attempt to fix via npm install
 				var command = 'cd '+service.dir+' && npm install && echo "Finished"';
 				console.log(command);

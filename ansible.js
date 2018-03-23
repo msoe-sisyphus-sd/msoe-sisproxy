@@ -71,7 +71,7 @@ var Ansible = function() {
 
 			var socket = tls.connect(port, address, options, function () {
 				self.get(service).is_connected = true;
-				// self.logEvent(1, service + " Connected", self.get(service).is_connected);
+				self.logEvent(1, "Ansible Socket Connected:", service);
 				cb(null,true);
 			});
 
@@ -98,9 +98,9 @@ var Ansible = function() {
 				cb(err,null);
 			});
 			json_socket.on('close',function(){
-				self.logEvent(1, "Ansible Socket Closed:", service);
 				var service_obj = self.get(service);
 				if (service_obj.is_connected) {
+					self.logEvent(1, "Ansible Socket Closed:", service);
 					service_obj.is_connected = false;
 
 					// check for _connectionClosed function in handler
