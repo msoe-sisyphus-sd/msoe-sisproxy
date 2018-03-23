@@ -91,24 +91,29 @@ _.each(config.service_versions, function (version, service) {
 	}
 });
 
-logEvent(1, config.service_branches);
+logEvent(1, "Services", config.service_branches, config.service_versions);
 
 _.each(config.services, function (service, key) {
     if (service.address !== 'localhost') return this;
 
 	// fix for sisbot 1.2.0
-	if (key == 'sisbot' && config.service_versions[key] == '1.2.0') {
-		try {
-			var command = 'cd '+config.base_dir+'/'+config.folders[key]+' && git reset --hard 5ef3122cd036a8e052fc762cdb84533596823dfc';
+	try {
+		if (key == 'sisbot' && config.service_versions[key] == '1.2.0') {
+			var command = 'cd '+config.base_dir+'/'+config.folders[key]+' && git config --global user.name Sisyphus && git config --global user.email pi@sisyphus-industries.com && git reset --hard a7438e8e6a48138e521bbf328d9e259116aad2e6 && git pull origin master';
 			var resp = execSync(command, {encoding:"utf8"});
-		} catch(err) {
-			logEvent(2, "1.2.0 fix error", err);
+
+			// Restart self
+			restart_node();
 		}
+	} catch(err) {
+		logEvent(2, "1.2.0 fix error", err);
 	}
 
 	create_service(service, function(err, resp) {
 		if (err) {
 			if (!state[key].npm_restart) {
+				logEvent(2, "NPM Restart");
+
 				// attempt to fix via npm install
 				var command = 'cd '+service.dir+' && npm install && echo "Finished"';
 				console.log(command);
