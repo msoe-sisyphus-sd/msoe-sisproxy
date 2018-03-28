@@ -38,7 +38,7 @@ if (config.folders.logs) {
 
 
 var logEvent = function() {
-	var line = Date.now();
+	var line = moment().format('YYYYMMDD HH:mm:ss Z');
 	_.each(arguments, function(obj, index) {
 		if (_.isObject(obj)) line += "\t"+JSON.stringify(obj);
 		else line += "\t"+obj;
@@ -116,7 +116,7 @@ _.each(config.services, function (service, key) {
 
 				// attempt to fix via npm install
 				var command = 'cd '+service.dir+' && npm install && echo "Finished"';
-				console.log(command);
+				logEvent(2, command);
 				execSync(command, {encoding:"utf8"});
 
 				// Save state
@@ -148,7 +148,7 @@ _.each(config.services, function (service, key) {
 });
 
 function create_service(service,cb) {
-	console.log("Create", service);
+	logEvent(1, "Create", service);
 	try {
 	    var service_obj = require(service.dir + '/server.js');
 		var send_config = JSON.parse(JSON.stringify(config));
@@ -182,7 +182,7 @@ function git_state() {
 	if (process.env.NODE_ENV.indexOf('sisbot') < 0) return; // skip
 
 	if (state.sisbot.running && state.app.running) {
-		// console.log("Git State", state.sisbot.running, state.app.running);
+		// logEvent(1, "Git State", state.sisbot.running, state.app.running);
 		exec('cd '+config.base_dir+'/sisbot && git log -1 --stat', (error, stdout, stderr) => {
 			if (error) return logEvent(2, 'exec error:',error);
 
@@ -290,7 +290,7 @@ http.createServer(function (request, response) {
 	try {
 		var ignore_urls = ['/sisbot/state','/sisbot/connect','/sisbot/exists'];
 		if (ignore_urls.indexOf(request.url) < 0) logEvent(1, "Request:", request.url);
-		
+
         var active_port = config.services[domain].port;
 
     	proxy.web(request, response, { target: 'http://127.0.0.1:' + config.services[domain].port, secure: false });
