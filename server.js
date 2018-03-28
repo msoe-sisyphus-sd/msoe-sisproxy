@@ -288,7 +288,9 @@ http.createServer(function (request, response) {
 	if (domain == undefined) domain = request.url.split("/")[1];
 
 	try {
-		if (request.url != '/sisbot/state') logEvent(1, "Request:", request.url);
+		var ignore_urls = ['/sisbot/state','/sisbot/connect','/sisbot/exists'];
+		if (ignore_urls.indexOf(request.url) < 0) logEvent(1, "Request:", request.url);
+		
         var active_port = config.services[domain].port;
 
     	proxy.web(request, response, { target: 'http://127.0.0.1:' + config.services[domain].port, secure: false });
