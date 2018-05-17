@@ -150,7 +150,7 @@ _.each(config.services, function (service, key) {
 function create_service(service,cb) {
 	logEvent(1, "Create", service);
 	try {
-	    var service_obj = require(service.dir + '/server.js');
+	  var service_obj = require(service.dir + '/server.js');
 		var send_config = JSON.parse(JSON.stringify(config));
 		service_obj(send_config, ansible());
 
@@ -163,6 +163,7 @@ function create_service(service,cb) {
 
 function save_services_state() {
 	if (process.env.NODE_ENV.indexOf('sisbot') < 0) return; // skip
+	if (process.env.NODE_ENV.indexOf('dev') != -1) return; // skip
 
 	var sanitized_state = JSON.parse(JSON.stringify(state));
 	_.each(sanitized_state, function(obj, key) {
@@ -180,6 +181,7 @@ function save_services_state() {
 
 function git_state() {
 	if (process.env.NODE_ENV.indexOf('sisbot') < 0) return; // skip
+	if (process.env.NODE_ENV.indexOf('dev') != -1) return; // skip
 
 	if (state.sisbot.running && state.app.running) {
 		// logEvent(1, "Git State", state.sisbot.running, state.app.running);
@@ -211,6 +213,8 @@ function git_state() {
 }
 
 function restart_node() {
+	if (process.env.NODE_ENV.indexOf('dev') > -1) return; // skip dev
+
 	logEvent(1, "Restart Node");
 	var ls = spawn('./restart.sh',[],{cwd:config.base_dir+'/'+config.folders.proxy,detached:true,stdio:'ignore'});
 	ls.on('error', (err) => {
@@ -223,6 +227,7 @@ function restart_node() {
 
 function revert_reset() {
 	if (process.env.NODE_ENV.indexOf('sisbot') < 0) return; // skip
+	if (process.env.NODE_ENV.indexOf('dev') > -1) return; // skip dev
 
 	logEvent(1, "Revert Reset", "Sisbot", state.sisbot.git_stable, "Siscloud", state.app.git_stable);
 	var ls = spawn('./revert_reset.sh',[state.sisbot.git_stable, state.app.git_stable],{cwd:config.base_dir+'/'+config.folders.proxy,detached:true,stdio:'ignore'});
@@ -284,16 +289,16 @@ http.createServer(function (request, response) {
 	// logEvent(1, "Domain", domain);
 
 	if (!config.services[domain]) domain = domain_origin.substring(0,domain_origin.indexOf('.'));
-    if (!config.services[domain]) domain = config.default_server;
+  if (!config.services[domain]) domain = config.default_server;
 	if (domain == undefined) domain = request.url.split("/")[1];
 
 	try {
 		var ignore_urls = ['/sisbot/state','/sisbot/connect','/sisbot/exists'];
 		if (ignore_urls.indexOf(request.url) < 0) logEvent(1, "Request:", request.url);
 
-        var active_port = config.services[domain].port;
+    var active_port = config.services[domain].port;
 
-    	proxy.web(request, response, { target: 'http://127.0.0.1:' + config.services[domain].port, secure: false });
+  	proxy.web(request, response, { target: 'http://127.0.0.1:' + config.services[domain].port, secure: false });
 	} catch (err) {
 		logEvent(2, "Redirect Err", err);
 	}
