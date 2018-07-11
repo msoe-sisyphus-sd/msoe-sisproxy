@@ -167,6 +167,20 @@ var config = {
             app: 'app'
         },
     },
+    joel: {
+        port_ssl: 3101,
+        port_redirect: 3000,
+        default_domain: 'sisyphus.dev.withease.io',
+        base_dir: '/Users/JoelS/code/sisyphus',
+        base_certs: '/Users/JoelS/code/sisyphus/sisproxy/certs',
+        folders: {
+            cloud: 'siscloud',
+            api: 'api',
+            sisbot: 'sisbot',
+            proxy: 'sisproxy',
+            app: 'siscloud'
+        },
+    },
     matt: {
         pi_serial: "0000000000000000",
         port_ssl: 3101,
