@@ -82,6 +82,7 @@ _.each(config.service_versions, function (version, service) {
 	try {
 	    var service_config  = require(config.base_dir + '/' + config.folders[service] + '/config.js');
 	    config.service_versions[service] = service_config.version;
+		logEvent(1,"Service-at:",service,"Version",service_config.version);
 		var command = 'cd '+config.base_dir+'/'+config.folders[service]+' && git rev-parse --abbrev-ref HEAD';
 		var resp = execSync(command, {encoding:"utf8"});
 		config.service_branches[service] = resp.trim();
