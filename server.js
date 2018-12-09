@@ -259,47 +259,53 @@ if (config.include_https) {
 	        var ctx = tls.createSecureContext(get_certificates(servername));
 	        cb(null, ctx);
 	    }
-	}, function(request, response) {
+		}, function(request, response) {
 	    var domain_origin  = request.headers.host.replace(/\:[0-9]{4}/gi, '');
-		domain = domain_origin;
+			domain = domain_origin;
 
-		logEvent(1, "Https Domain", domain);
+			logEvent(1, "Https Domain", domain);
 
-		if (!config.services[domain]) domain = domain_origin.substring(0,domain_origin.indexOf('.'));
-	    if (!config.services[domain]) domain = config.default_server;
+			if (!config.services[domain]) domain = domain_origin.substring(0,domain_origin.indexOf('.'));
+		  if (!config.services[domain]) domain = config.default_server;
 
-		try {
-			logEvent(1, "Request:", domain, config.services[domain]);
-		    var active_port = config.services[domain].port;
-
-			proxy.web(request, response, { target: 'http://127.0.0.1:' + config.services[domain].port, secure: false, ws: true });
-		} catch (err) {
-			logEvent(2, "Redirect Err", err);
-		}
-	}).listen(config.port_ssl, function() {
+			try {
+				logEvent(1, "SisProxy HTTPS Request:", domain, config.services[domain]);
+			  var active_port = config.services[domain].port;
+				proxy.web(request, response, { target: 'http://127.0.0.1:' + config.services[domain].port, secure: false, ws: true });
+			} 
+			catch (err) 
+			{
+				logEvent(2, "SisProxy Redirect Err", err);
+			}
+		}).listen(config.port_ssl, function() {
 	    logEvent(1, "SSL Proxy listening on port " + config.port_ssl);
-	});
+		}
+	);
 }
 
 /****** REDIRECT SERVER ******/
 http.createServer(function (request, response) {
     var domain_origin  = request.headers.host.replace(/\:[0-9]{4}/gi, '');
-	domain = domain_origin;
+		domain = domain_origin;
 
-	// logEvent(1, "Domain", domain);
+		// logEvent(1, "Domain", domain);
 
-	if (!config.services[domain]) domain = domain_origin.substring(0,domain_origin.indexOf('.'));
-  if (!config.services[domain]) domain = config.default_server;
-	if (domain == undefined) domain = request.url.split("/")[1];
+		if (!config.services[domain]) domain = domain_origin.substring(0,domain_origin.indexOf('.'));
+	  if (!config.services[domain]) domain = config.default_server;
+		if (domain == undefined) domain = request.url.split("/")[1];
 
-	try {
-		var ignore_urls = ['/sisbot/state','/sisbot/connect','/sisbot/exists'];
-		if (ignore_urls.indexOf(request.url) < 0) logEvent(1, "Request:", request.url);
+		try {
+			var ignore_urls = ['/sisbot/state','/sisbot/connect','/sisbot/exists'];
+			if (ignore_urls.indexOf(request.url) < 0) logEvent(1, "SisProxy Request:", request.url);
 
-    var active_port = config.services[domain].port;
+	    var active_port = config.services[domain].port;
 
-  	proxy.web(request, response, { target: 'http://127.0.0.1:' + config.services[domain].port, secure: false });
-	} catch (err) {
-		logEvent(2, "Redirect Err", err);
-	}
+	  	proxy.web(request, response, { target: 'http://127.0.0.1:' + config.services[domain].port, secure: false });
+		} 
+		catch (err) 
+		{
+			logEvent(2, "SisProxy Redirect Err", err);
+		}
 }).listen(config.port_redirect);
+
+
