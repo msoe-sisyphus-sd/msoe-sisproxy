@@ -296,11 +296,22 @@ http.createServer(function (request, response) {
 
 		try {
 			var ignore_urls = ['/sisbot/state','/sisbot/connect','/sisbot/exists'];
-			if (ignore_urls.indexOf(request.url) < 0) logEvent(1, "SisProxy Request:", request.url);
 
 	    var active_port = config.services[domain].port;
 
-	  	proxy.web(request, response, { target: 'http://127.0.0.1:' + config.services[domain].port, secure: false });
+	    var m = request.url.match("/api/");
+
+	    // logEvent(1,"proxy process.env.NODE_ENV ", process.env.NODE_ENV);
+
+	    if (process.env.NODE_ENV.indexOf('sisbot') > -1 && m != null)
+	    {
+		  	logEvent(1,"Sisproxy got an api request, ignoring ",request.url);
+		  }
+		  else
+		  {
+  			if (ignore_urls.indexOf(request.url) < 0) logEvent(1, "SisProxy HTTP 80 Request:", request.url);
+		  	proxy.web(request, response, { target: 'http://127.0.0.1:' + config.services[domain].port, secure: false });
+		  }
 		} 
 		catch (err) 
 		{

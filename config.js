@@ -2,7 +2,7 @@ var _ = require('underscore');
 
 var config = {
     base: {
-        version: '1.3.4', // Reduced Logging
+        version: '1.3.5', // if sisbot, then ignore urls to  /api/*
         include_https: true,
         port_ssl: 443,
         port_redirect: 80,
