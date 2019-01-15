@@ -263,13 +263,13 @@ if (config.include_https) {
 	    var domain_origin  = request.headers.host.replace(/\:[0-9]{4}/gi, '');
 			domain = domain_origin;
 
-			logEvent(1, "Https Domain", domain);
+			// logEvent(1, "Https Domain", domain);
 
 			if (!config.services[domain]) domain = domain_origin.substring(0,domain_origin.indexOf('.'));
 		  if (!config.services[domain]) domain = config.default_server;
 
 			try {
-				logEvent(1, "SisProxy HTTPS Request:", domain, config.services[domain]);
+				// logEvent(1, "SisProxy HTTPS Request:", domain, config.services[domain]);
 			  var active_port = config.services[domain].port;
 				proxy.web(request, response, { target: 'http://127.0.0.1:' + config.services[domain].port, secure: false, ws: true });
 			} 
@@ -285,7 +285,11 @@ if (config.include_https) {
 
 /****** REDIRECT SERVER ******/
 http.createServer(function (request, response) {
-    var domain_origin  = request.headers.host.replace(/\:[0-9]{4}/gi, '');
+    var domain_origin  = "";
+    if (request.headers.host)
+    {
+    	domain_origin  =	request.headers.host.replace(/\:[0-9]{4}/gi, '');
+    }
 		domain = domain_origin;
 
 		// logEvent(1, "Domain", domain);
