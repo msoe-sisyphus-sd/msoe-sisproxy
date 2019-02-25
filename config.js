@@ -181,6 +181,20 @@ var config = {
             app: 'siscloud'
         },
     },
+    curtis: {
+        port_ssl: 3101,
+        port_redirect: 3000,
+        default_domain: 'sisyphus.dev.withease.io',
+        base_dir: '/Users/curtismorice/Desktop/sisyphus_master',
+        base_certs: '/Users/curtismorice/Desktop/sisyphus_master/sisproxy/certs/',
+        folders: {
+            cloud: 'app',
+            api: 'api',
+            sisbot: 'sisbot',
+            proxy: 'proxy',
+            app: 'siscloud'
+        },
+    },
     matt: {
         pi_serial: "0000000000000000",
         port_ssl: 3101,
