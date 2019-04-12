@@ -2,7 +2,7 @@ var _ = require('underscore');
 
 var config = {
     base: {
-        version: '1.3.6', // if sisbot, then ignore urls to  /api/*  1.3.6 reduce logging, dont revert_reset if in dev mode
+        version: '1.3.7', // 1.3.7 reinstall_npm moved to own function, skips if in dev env
         include_https: true,
         port_ssl: 443,
         port_redirect: 80,

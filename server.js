@@ -112,19 +112,7 @@ _.each(config.services, function (service, key) {
 	create_service(service, function(err, resp) {
 		if (err) {
 			if (!state[key].npm_restart) {
-				logEvent(2, "NPM Restart");
-
-				// attempt to fix via npm install
-				var command = 'cd '+service.dir+' && npm install && echo "Finished"';
-				logEvent(2, command);
-				execSync(command, {encoding:"utf8"});
-
-				// Save state
-				state[key].npm_restart = true;
-				save_services_state();
-
-				// Restart self
-				restart_node();
+				reinstall_npm(service, key);
 			} else {
 				// Revert to known good state
 				logEvent(2, "Revert to known good state");
@@ -159,6 +147,23 @@ function create_service(service,cb) {
 		logEvent(2, "Service error:", service.port, err);
 		if (cb) cb(err, null);
 	}
+}
+
+function reinstall_npm(service, key) {
+	if (process.env.NODE_ENV.indexOf('dev') != -1) return; // skip
+	logEvent(2, "NPM Restart");
+
+	// attempt to fix via npm install
+	var command = 'cd '+service.dir+' && npm install && echo "Finished"';
+	logEvent(2, command);
+	execSync(command, {encoding:"utf8"});
+
+	// Save state
+	state[key].npm_restart = true;
+	save_services_state();
+
+	// Restart self
+	restart_node();
 }
 
 function save_services_state() {
@@ -272,8 +277,8 @@ if (config.include_https) {
 				// logEvent(1, "SisProxy HTTPS Request:", domain, config.services[domain]);
 			  var active_port = config.services[domain].port;
 				proxy.web(request, response, { target: 'http://127.0.0.1:' + config.services[domain].port, secure: false, ws: true });
-			} 
-			catch (err) 
+			}
+			catch (err)
 			{
 				logEvent(2, "SisProxy Redirect Err", err);
 			}
@@ -316,11 +321,9 @@ http.createServer(function (request, response) {
   			if (ignore_urls.indexOf(request.url) < 0) logEvent(1, "SisProxy HTTP 80 Request:", request.url);
 		  	proxy.web(request, response, { target: 'http://127.0.0.1:' + config.services[domain].port, secure: false });
 		  }
-		} 
-		catch (err) 
+		}
+		catch (err)
 		{
 			logEvent(2, "SisProxy Redirect Err", err);
 		}
 }).listen(config.port_redirect);
-
-
