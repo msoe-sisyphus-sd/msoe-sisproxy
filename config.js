@@ -2,7 +2,7 @@ var _ = require('underscore');
 
 var config = {
     base: {
-        version: '1.2.2', // Sisbot 1.2.0 merge fix
+        version: '1.4.7', // 1.4.7 reinstall_npm moved to own function, skips if in dev env
         include_https: true,
         port_ssl: 443,
         port_redirect: 80,
@@ -165,6 +165,34 @@ var config = {
             sisbot: 'sisbot',
             proxy: 'proxy',
             app: 'app'
+        },
+    },
+    joel: {
+        port_ssl: 3101,
+        port_redirect: 3000,
+        default_domain: 'sisyphus.dev.withease.io',
+        base_dir: '/Users/JoelS/code/sisyphus',
+        base_certs: '/Users/JoelS/code/sisyphus/sisproxy/certs',
+        folders: {
+            cloud: 'siscloud',
+            api: 'api',
+            sisbot: 'sisbot',
+            proxy: 'sisproxy',
+            app: 'siscloud'
+        },
+    },
+    curtis: {
+        port_ssl: 3101,
+        port_redirect: 3000,
+        default_domain: 'sisyphus.dev.withease.io',
+        base_dir: '/Users/curtismorice/Desktop/sisyphus_master',
+        base_certs: '/Users/curtismorice/Desktop/sisyphus_master/sisproxy/certs/',
+        folders: {
+            cloud: 'app',
+            api: 'api',
+            sisbot: 'sisbot',
+            proxy: 'proxy',
+            app: 'siscloud'
         },
     },
     matt: {
