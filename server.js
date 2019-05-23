@@ -112,19 +112,7 @@ _.each(config.services, function (service, key) {
 	create_service(service, function(err, resp) {
 		if (err) {
 			if (!state[key].npm_restart) {
-				logEvent(2, "NPM Restart");
-
-				// attempt to fix via npm install
-				var command = 'cd '+service.dir+' && npm install && echo "Finished"';
-				logEvent(2, command);
-				execSync(command, {encoding:"utf8"});
-
-				// Save state
-				state[key].npm_restart = true;
-				save_services_state();
-
-				// Restart self
-				restart_node();
+				reinstall_npm(service, key);
 			} else {
 				// Revert to known good state
 				logEvent(2, "Revert to known good state");
@@ -159,6 +147,23 @@ function create_service(service,cb) {
 		logEvent(2, "Service error:", service.port, err);
 		if (cb) cb(err, null);
 	}
+}
+
+function reinstall_npm(service, key) {
+	if (process.env.NODE_ENV.indexOf('dev') != -1) return; // skip
+	logEvent(2, "NPM Restart");
+
+	// attempt to fix via npm install
+	var command = 'cd '+service.dir+' && npm install && echo "Finished"';
+	logEvent(2, command);
+	execSync(command, {encoding:"utf8"});
+
+	// Save state
+	state[key].npm_restart = true;
+	save_services_state();
+
+	// Restart self
+	restart_node();
 }
 
 function save_services_state() {
@@ -259,47 +264,66 @@ if (config.include_https) {
 	        var ctx = tls.createSecureContext(get_certificates(servername));
 	        cb(null, ctx);
 	    }
-	}, function(request, response) {
+		}, function(request, response) {
 	    var domain_origin  = request.headers.host.replace(/\:[0-9]{4}/gi, '');
-		domain = domain_origin;
+			domain = domain_origin;
 
-		logEvent(1, "Https Domain", domain);
+			// logEvent(1, "Https Domain", domain);
 
-		if (!config.services[domain]) domain = domain_origin.substring(0,domain_origin.indexOf('.'));
-	    if (!config.services[domain]) domain = config.default_server;
+			if (!config.services[domain]) domain = domain_origin.substring(0,domain_origin.indexOf('.'));
+		  if (!config.services[domain]) domain = config.default_server;
 
-		try {
-			logEvent(1, "Request:", domain, config.services[domain]);
-		    var active_port = config.services[domain].port;
-
-			proxy.web(request, response, { target: 'http://127.0.0.1:' + config.services[domain].port, secure: false, ws: true });
-		} catch (err) {
-			logEvent(2, "Redirect Err", err);
-		}
-	}).listen(config.port_ssl, function() {
+			try {
+				// logEvent(1, "SisProxy HTTPS Request:", domain, config.services[domain]);
+			  var active_port = config.services[domain].port;
+				proxy.web(request, response, { target: 'http://127.0.0.1:' + config.services[domain].port, secure: false, ws: true });
+			}
+			catch (err)
+			{
+				logEvent(2, "SisProxy Redirect Err", err);
+			}
+		}).listen(config.port_ssl, function() {
 	    logEvent(1, "SSL Proxy listening on port " + config.port_ssl);
-	});
+		}
+	);
 }
 
 /****** REDIRECT SERVER ******/
 http.createServer(function (request, response) {
-    var domain_origin  = request.headers.host.replace(/\:[0-9]{4}/gi, '');
-	domain = domain_origin;
+    var domain_origin  = "";
+    if (request.headers.host)
+    {
+    	domain_origin  =	request.headers.host.replace(/\:[0-9]{4}/gi, '');
+    }
+		domain = domain_origin;
 
-	// logEvent(1, "Domain", domain);
+		// logEvent(1, "Domain", domain);
 
-	if (!config.services[domain]) domain = domain_origin.substring(0,domain_origin.indexOf('.'));
-  if (!config.services[domain]) domain = config.default_server;
-	if (domain == undefined) domain = request.url.split("/")[1];
+		if (!config.services[domain]) domain = domain_origin.substring(0,domain_origin.indexOf('.'));
+	  if (!config.services[domain]) domain = config.default_server;
+		if (domain == undefined) domain = request.url.split("/")[1];
 
-	try {
-		var ignore_urls = ['/sisbot/state','/sisbot/connect','/sisbot/exists'];
-		if (ignore_urls.indexOf(request.url) < 0) logEvent(1, "Request:", request.url);
+		try {
+			var ignore_urls = ['/sisbot/state','/sisbot/connect','/sisbot/exists'];
 
-    var active_port = config.services[domain].port;
+	    var active_port = config.services[domain].port;
 
-  	proxy.web(request, response, { target: 'http://127.0.0.1:' + config.services[domain].port, secure: false });
-	} catch (err) {
-		logEvent(2, "Redirect Err", err);
-	}
+	    var m = request.url.match("/api/");
+
+	    // logEvent(1,"proxy process.env.NODE_ENV ", process.env.NODE_ENV);
+
+	    if (process.env.NODE_ENV.indexOf('sisbot') > -1 && m != null)
+	    {
+		  	logEvent(1,"Sisproxy got an api request, ignoring ",request.url);
+		  }
+		  else
+		  {
+  			if (ignore_urls.indexOf(request.url) < 0) logEvent(1, "SisProxy HTTP 80 Request:", request.url);
+		  	proxy.web(request, response, { target: 'http://127.0.0.1:' + config.services[domain].port, secure: false });
+		  }
+		}
+		catch (err)
+		{
+			logEvent(2, "SisProxy Redirect Err", err);
+		}
 }).listen(config.port_redirect);
