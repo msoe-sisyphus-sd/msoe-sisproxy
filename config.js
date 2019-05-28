@@ -2,7 +2,7 @@ var _ = require('underscore');
 
 var config = {
     base: {
-        version: '1.3.8', // 1.3.8 Disable the deletion of status.json file on revert_reset
+        version: '1.4.0', // 1.4.0 Disable the deletion of status.json file on revert_reset, Node v8 update
         include_https: true,
         port_ssl: 443,
         port_redirect: 80,
