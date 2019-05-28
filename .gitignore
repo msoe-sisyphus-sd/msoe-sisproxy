@@ -1,4 +1,9 @@
 *.DS_Store
 /node_modules/*
 
+# Logs
+logs
+*.log
+
 state.json
+package-lock.json

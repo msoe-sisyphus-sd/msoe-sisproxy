@@ -10,13 +10,13 @@ echo "Stopping PID :"$nodepid >> restart.log
 sudo kill -9 $nodepid
 done
 
-# remove status
+# remove state
 cd /home/pi/sisbot-server/sisproxy/
 rm state.json
 
 # remove status
-cd /home/pi/sisbot-server/sisbot/content/
-rm status.json
+# cd /home/pi/sisbot-server/sisbot/content/
+# rm status.json
 
 # reset sisbot
 cd /home/pi/sisbot-server/sisbot
