@@ -169,7 +169,7 @@ var config = {
     },
     curtis: {
         port_ssl: 3101,
-        port_redirect: 3000,
+        port_redirect: 3100,
         default_domain: 'sisyphus.dev.withease.io',
         base_dir: '/Users/curtismorice/Desktop/sisyphus_master',
         base_certs: '/Users/curtismorice/Desktop/sisyphus_master/sisproxy/certs/',
@@ -180,6 +180,27 @@ var config = {
             proxy: 'proxy',
             app: 'siscloud'
         },
+        servers: function() {
+            return {
+                app: {
+                    dir: this.base_dir + '/' + this.folders.app,
+                    port: 3001,
+                    has_server: true
+                },
+             
+            }
+        },
+        services: function() {
+            return {
+                app: {
+                    dir: this.base_dir + '/' + this.folders.app,
+                    address: 'localhost',
+                    port: 3001,
+                    has_server: true
+                },
+          
+            }
+        }
     },
     matt: {
         pi_serial: "0000000000000000",
