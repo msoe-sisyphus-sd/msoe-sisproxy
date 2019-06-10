@@ -2,7 +2,7 @@ var _ = require('underscore');
 
 var config = {
     base: {
-        version: '1.3.7', // 1.3.7 reinstall_npm moved to own function, skips if in dev env
+        version: '1.3.8', // 1.3.8 Disable the deletion of status.json file on revert_reset
         include_https: true,
         port_ssl: 443,
         port_redirect: 80,
@@ -214,20 +214,6 @@ var config = {
             }
         }
     },
-    travis: {
-        port_ssl: 3101,
-        port_redirect: 3000,
-        default_domain: 'sisyphus.dev.withease.io',
-        base_dir: '/Users/kiefertravis/Documents/sisyphus',
-        base_certs: '/Users/kiefertravis/Documents/sisyphus/proxy/certs/',
-        folders: {
-            cloud: 'app',
-            api: 'api',
-            sisbot: 'sisbot',
-            proxy: 'proxy',
-            app: 'app'
-        },
-    },
     joel: {
         port_ssl: 3101,
         port_redirect: 3000,
@@ -263,7 +249,7 @@ var config = {
     },
     curtis: {
         port_ssl: 3101,
-        port_redirect: 3000,
+        port_redirect: 3100,
         default_domain: 'sisyphus.dev.withease.io',
         base_dir: '/Users/curtismorice/Desktop/sisyphus_master',
         base_certs: '/Users/curtismorice/Desktop/sisyphus_master/sisproxy/certs/',
@@ -274,6 +260,27 @@ var config = {
             proxy: 'proxy',
             app: 'siscloud'
         },
+        servers: function() {
+            return {
+                app: {
+                    dir: this.base_dir + '/' + this.folders.app,
+                    port: 3001,
+                    has_server: true
+                },
+             
+            }
+        },
+        services: function() {
+            return {
+                app: {
+                    dir: this.base_dir + '/' + this.folders.app,
+                    address: 'localhost',
+                    port: 3001,
+                    has_server: true
+                },
+          
+            }
+        }
     },
     matt: {
         pi_serial: "0000000000000000",
