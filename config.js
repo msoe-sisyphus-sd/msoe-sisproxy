@@ -98,6 +98,67 @@ var config = {
             }
         }
     },
+    sisyphuslocal: {
+        version: '1.3.7', // 1.3.7 reinstall_npm moved to own function, skips if in dev env
+        include_https: true,
+        port_ssl: 443,
+        port_redirect: 80,
+        debug: true,
+        default_domain: 'sisyphus.withease.io',
+        folders: {
+            cloud: 'sisyphus_cloud',
+            api: 'sisapi',
+            sisbot: 'sisbot',
+            proxy: 'sisproxy',
+            app: 'siscloud'
+        },
+        base_dir: '/Users/JoelS/code/sisyphus',
+        base_certs: '/Users/JoelS/code/sisyphus/letsencrypt/live/',
+        service_versions: {
+            proxy: '0.0.1',
+            app: '0.0.1',
+            api: '0.0.1',
+            sisbot: '0.0.1'
+        },
+        service_branches: { // assume master, is fetched on node start
+            proxy: 'beta',
+            app: 'master',
+            api: 'master',
+            sisbot: 'beta'
+        },
+        servers: function() {
+            return {
+                siscloud: {
+                    dir: this.base_dir + '/' + this.folders.cloud,
+                    port: 3002,
+                    has_server: true
+                },
+                api: {
+                    dir: this.base_dir + '/' + this.folders.api,
+                    port: 3005,
+                    debug: true,
+                    has_server: true
+                }
+            }
+        },
+        services: function() {
+            return {
+                siscloud: {
+                    dir: '/Users/JoelS/code/sisyphus' + '/' + this.folders.cloud,
+                    address: 'localhost',
+                    port: 3002,
+                    has_server: true
+                },
+                api: {
+                    dir: '/Users/JoelS/code/sisyphus' + '/' + this.folders.api,
+                    address: 'localhost',
+                    port: 3005,
+                    ansible_port: 8092,
+                    connect: []
+                }
+            }
+        }
+    },
     sisbot: {
         include_https: false,
         default_domain: 'sisbot.local',
@@ -174,12 +235,31 @@ var config = {
         base_dir: '/Users/JoelS/code/sisyphus',
         base_certs: '/Users/JoelS/code/sisyphus/sisproxy/certs',
         folders: {
-            cloud: 'siscloud',
+            cloud: 'app',
             api: 'api',
             sisbot: 'sisbot',
-            proxy: 'sisproxy',
+            proxy: 'proxy',
             app: 'siscloud'
         },
+        servers: function() {
+            return {
+                app: {
+                    dir: this.base_dir + '/' + this.folders.app,
+                    port: 3001,
+                    has_server: true
+                }
+            }
+        },
+        services: function() {
+            return {
+                app: {
+                    dir: this.base_dir + '/' + this.folders.app,
+                    address: 'localhost',
+                    port: 3001,
+                    has_server: true
+                }
+            }
+        }
     },
     curtis: {
         port_ssl: 3101,
