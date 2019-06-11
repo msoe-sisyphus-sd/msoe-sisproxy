@@ -2,7 +2,7 @@ var _ = require('underscore');
 
 var config = {
     base: {
-        version: '1.3.8', // 1.3.8 Disable the deletion of status.json file on revert_reset
+        version: '1.3.9', // Forward :80 requests to cloud (app) service
         include_https: true,
         port_ssl: 443,
         port_redirect: 80,
@@ -100,6 +100,7 @@ var config = {
     },
     sisbot: {
         include_https: false,
+        default_server: 'app',
         default_domain: 'sisbot.local',
         folders: {
             sisbot: 'sisbot',
