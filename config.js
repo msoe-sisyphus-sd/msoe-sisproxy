@@ -2,7 +2,7 @@ var _ = require('underscore');
 
 var config = {
     base: {
-        version: '1.4.0', // 1.4.0 Disable the deletion of status.json file on revert_reset, Node v8 update
+        version: '1.4.1', // Delete entire node_modules folder on revert_reset, allow port 80 directing
         include_https: true,
         port_ssl: 443,
         port_redirect: 80,
@@ -98,9 +98,71 @@ var config = {
             }
         }
     },
+    sisyphuslocal: {
+        version: '1.3.7', // 1.3.7 reinstall_npm moved to own function, skips if in dev env
+        include_https: true,
+        port_ssl: 443,
+        port_redirect: 80,
+        debug: true,
+        default_domain: 'sisyphus.withease.io',
+        folders: {
+            cloud: 'sisyphus_cloud',
+            api: 'sisapi',
+            sisbot: 'sisbot',
+            proxy: 'sisproxy',
+            app: 'siscloud'
+        },
+        base_dir: '/Users/JoelS/code/sisyphus',
+        base_certs: '/Users/JoelS/code/sisyphus/letsencrypt/live/',
+        service_versions: {
+            proxy: '0.0.1',
+            app: '0.0.1',
+            api: '0.0.1',
+            sisbot: '0.0.1'
+        },
+        service_branches: { // assume master, is fetched on node start
+            proxy: 'beta',
+            app: 'master',
+            api: 'master',
+            sisbot: 'beta'
+        },
+        servers: function() {
+            return {
+                siscloud: {
+                    dir: this.base_dir + '/' + this.folders.cloud,
+                    port: 3002,
+                    has_server: true
+                },
+                api: {
+                    dir: this.base_dir + '/' + this.folders.api,
+                    port: 3005,
+                    debug: true,
+                    has_server: true
+                }
+            }
+        },
+        services: function() {
+            return {
+                siscloud: {
+                    dir: '/Users/JoelS/code/sisyphus' + '/' + this.folders.cloud,
+                    address: 'localhost',
+                    port: 3002,
+                    has_server: true
+                },
+                api: {
+                    dir: '/Users/JoelS/code/sisyphus' + '/' + this.folders.api,
+                    address: 'localhost',
+                    port: 3005,
+                    ansible_port: 8092,
+                    connect: []
+                }
+            }
+        }
+    },
     sisbot: {
         include_https: false,
-        default_domain: 'sisbot.local',
+        default_server: 'app',
+        default_domain: 'sisyphus.local',
         folders: {
             sisbot: 'sisbot',
             proxy: 'sisproxy',
@@ -160,16 +222,35 @@ var config = {
         base_dir: '/Users/JoelS/code/sisyphus',
         base_certs: '/Users/JoelS/code/sisyphus/sisproxy/certs',
         folders: {
-            cloud: 'siscloud',
+            cloud: 'app',
             api: 'api',
             sisbot: 'sisbot',
-            proxy: 'sisproxy',
+            proxy: 'proxy',
             app: 'siscloud'
         },
+        servers: function() {
+            return {
+                app: {
+                    dir: this.base_dir + '/' + this.folders.app,
+                    port: 3001,
+                    has_server: true
+                }
+            }
+        },
+        services: function() {
+            return {
+                app: {
+                    dir: this.base_dir + '/' + this.folders.app,
+                    address: 'localhost',
+                    port: 3001,
+                    has_server: true
+                }
+            }
+        }
     },
     curtis: {
         port_ssl: 3101,
-        port_redirect: 3000,
+        port_redirect: 3100,
         default_domain: 'sisyphus.dev.withease.io',
         base_dir: '/Users/curtismorice/Desktop/sisyphus_master',
         base_certs: '/Users/curtismorice/Desktop/sisyphus_master/sisproxy/certs/',
@@ -180,6 +261,27 @@ var config = {
             proxy: 'proxy',
             app: 'siscloud'
         },
+        servers: function() {
+            return {
+                app: {
+                    dir: this.base_dir + '/' + this.folders.app,
+                    port: 3001,
+                    has_server: true
+                },
+
+            }
+        },
+        services: function() {
+            return {
+                app: {
+                    dir: this.base_dir + '/' + this.folders.app,
+                    address: 'localhost',
+                    port: 3001,
+                    has_server: true
+                },
+
+            }
+        }
     },
     matt: {
         pi_serial: "0000000000000000",

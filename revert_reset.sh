@@ -25,6 +25,7 @@ if [ -n "$1" ]; then
 else
 	git reset --hard
 fi
+rm -rf node_modules
 npm install
 
 # reset siscloud
@@ -34,6 +35,7 @@ if [ -n "$2" ]; then
 else
 	git reset --hard
 fi
+rm -rf node_modules
 npm install
 
 cd /home/pi/sisbot-server/sisproxy
