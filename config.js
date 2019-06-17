@@ -2,7 +2,7 @@ var _ = require('underscore');
 
 var config = {
     base: {
-        version: '1.3.9', // Forward :80 requests to cloud (app) service
+        version: '1.3.10', // Delete entire node_modules folder on revert_reset
         include_https: true,
         port_ssl: 443,
         port_redirect: 80,
@@ -162,7 +162,7 @@ var config = {
     sisbot: {
         include_https: false,
         default_server: 'app',
-        default_domain: 'sisbot.local',
+        default_domain: 'sisyphus.local',
         folders: {
             sisbot: 'sisbot',
             proxy: 'sisproxy',
@@ -268,7 +268,7 @@ var config = {
                     port: 3001,
                     has_server: true
                 },
-             
+
             }
         },
         services: function() {
@@ -279,7 +279,7 @@ var config = {
                     port: 3001,
                     has_server: true
                 },
-          
+
             }
         }
     },

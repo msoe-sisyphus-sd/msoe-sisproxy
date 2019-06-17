@@ -87,6 +87,7 @@ _.each(config.service_versions, function (version, service) {
 		config.service_branches[service] = resp.trim();
 	} catch (err) {
 		// Bad or no config, revert
+		logEvent(2, "Revert on err", service, err);
 		revert_reset();
 	}
 });
