@@ -2,7 +2,7 @@ var _ = require('underscore');
 
 var config = {
     base: {
-        version: '1.3.10', // Delete entire node_modules folder on revert_reset
+        version: '1.3.11', // Move tables over to webcenter
         include_https: true,
         port_ssl: 443,
         port_redirect: 80,
@@ -206,7 +206,7 @@ var config = {
                     connect: ['api']
                 },
                 api: {
-                    address: 'sisyphus.withease.io',
+                    address: 'webcenter.sisyphus-industries.com',
                     port: 3005,
                     ansible_port: 8092,
                     is_register: true,
