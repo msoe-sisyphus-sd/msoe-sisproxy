@@ -3,15 +3,15 @@ var http        = require('http');
 var tls         = require("tls");
 var fs          = require("fs");
 var httpProxy   = require('http-proxy');
-var exec 		= require('child_process').exec;
-var execSync	= require('child_process').execSync;
-var spawn 		= require('child_process').spawn;
+var exec 				= require('child_process').exec;
+var execSync		= require('child_process').execSync;
+var spawn 			= require('child_process').spawn;
 var express     = require('express');
 var bodyParser	= require('body-parser');
 var config      = require('./config.js');
 var _           = require('underscore');
-var moment 		= require('moment');
-var ansible 	= require('./ansible.js');
+var moment 			= require('moment');
+var ansible 		= require('./ansible.js');
 var used_ports  = [];
 
 /* ---------------- Logging ------------- */
@@ -45,6 +45,7 @@ var logEvent = function() {
 	});
 
 	// save to the log file for sisbot
+	if (arguments[0] == 2 || arguments[0] == '2') line = '\x1b[31m'+line+'\x1b[0m';
 	console.log(line);
 }
 
@@ -58,13 +59,36 @@ var proxy       = httpProxy.createServer();
 
 // load state.json
 var state = {};
+
+// stop future startup if any breaks detected
+var failure_detected = false;
+
 _.each(config.services, function(service, key) {
 	state[key] = {
 		npm_restart: false,
 		git_stable: '',
 		running: false
 	};
+
+	// check for node_modules folder, rebuild if not available
+	if (service.address == 'localhost' && !fs.existsSync(service.dir+'/node_modules')) {
+    logEvent(2, "Node_modules is missing in", service.dir);
+
+		// TODO: make sure network is connected first?
+		try {
+			var command = 'cd '+service.dir+' && sudo -u pi npm install';
+			execSync(command, {encoding:"utf8"});
+
+			logEvent(1, "NPM Install finished, restart");
+			failure_detected = true;
+			restart_node();
+		} catch (err) {
+			logEvent(2, "NPM Error", service.dir, err);
+		}
+	}
 });
+
+if (failure_detected) return;
 
 if (fs.existsSync(config.base_dir+'/'+config.folders.proxy+'/state.json')) {
 	//logEvent(1, "Load saved state:", config.base_dir+'/state.json');
@@ -78,24 +102,28 @@ if (fs.existsSync(config.base_dir+'/'+config.folders.proxy+'/state.json')) {
 	logEvent(1, "No State object found");
 }
 
+// check for the version/branch
 _.each(config.service_versions, function (version, service) {
 	try {
-	    var service_config  = require(config.base_dir + '/' + config.folders[service] + '/config.js');
-	    config.service_versions[service] = service_config.version;
+    var service_config  = require(config.base_dir + '/' + config.folders[service] + '/config.js');
+    config.service_versions[service] = service_config.version;
 		var command = 'cd '+config.base_dir+'/'+config.folders[service]+' && git rev-parse --abbrev-ref HEAD';
 		var resp = execSync(command, {encoding:"utf8"});
 		config.service_branches[service] = resp.trim();
 	} catch (err) {
 		// Bad or no config, revert
-		logEvent(2, "Revert on err", service, err);
-		revert_reset();
+		logEvent(2, "Version/Branch Revert on err", service, err);
+		failure_detected = true;
+		revert(service);
 	}
 });
+
+if (failure_detected) return;
 
 logEvent(1, "Services", config.service_branches, config.service_versions);
 
 _.each(config.services, function (service, key) {
-    if (service.address !== 'localhost') return this;
+  if (service.address !== 'localhost') return this;
 
 	// fix for sisbot 1.2.0
 	try {
@@ -155,7 +183,7 @@ function reinstall_npm(service, key) {
 	logEvent(2, "NPM Restart");
 
 	// attempt to fix via npm install
-	var command = 'cd '+service.dir+' && npm install && echo "Finished"';
+	var command = 'cd '+service.dir+' && sudo -u pi npm install && echo "Finished"';
 	logEvent(2, command);
 	execSync(command, {encoding:"utf8"});
 
@@ -219,7 +247,10 @@ function git_state() {
 }
 
 function restart_node() {
-	if (process.env.NODE_ENV.indexOf('dev') > -1) return; // skip dev
+	if (process.env.NODE_ENV.indexOf('dev') > -1) {
+		logEvent(1, "In dev mode, manually restart");
+		return; // skip dev
+	}
 
 	logEvent(1, "Restart Node");
 	var ls = spawn('./restart.sh',[],{cwd:config.base_dir+'/'+config.folders.proxy,detached:true,stdio:'ignore'});
@@ -229,19 +260,62 @@ function restart_node() {
 	ls.on('close', (code) => {
 	  logEvent(1, "child process exited with code",code);
 	});
+
+	// exit this process after spawning restart
+	// process.exit();
+}
+
+function revert(service) {
+	if (process.env.NODE_ENV.indexOf('sisbot') < 0) return; // skip
+	if (process.env.NODE_ENV.indexOf('dev') > -1) return; // skip dev
+
+	logEvent(1, "Revert", service);
+	var ls = exec('cd ' + config.base_dir + '/' + config.folders[service] + ' && git reset --hard', (error, stdout, stderr) => {
+		if (error) return logEvent(2, 'Revert error:',error);
+
+		restart_node();
+	});
 }
 
 function revert_reset() {
 	if (process.env.NODE_ENV.indexOf('sisbot') < 0) return; // skip
 	if (process.env.NODE_ENV.indexOf('dev') > -1) return; // skip dev
 
-	logEvent(1, "Revert Reset", "Sisbot", state.sisbot.git_stable, "Siscloud", state.app.git_stable);
-	var ls = spawn('./revert_reset.sh',[state.sisbot.git_stable, state.app.git_stable],{cwd:config.base_dir+'/'+config.folders.proxy,detached:true,stdio:'ignore'});
-	ls.on('error', (err) => {
-	  logEvent(2, 'Failed to start child process.');
+	validate_internet(function(err, resp) {
+		if (err) return logEvent(2, "Validate Internet Err", err);
+
+		if (resp == "true") {
+			logEvent(1, "Revert Reset", "Sisbot", state.sisbot.git_stable, "Siscloud", state.app.git_stable);
+			var ls = spawn('./revert_reset.sh',[state.sisbot.git_stable, state.app.git_stable],{cwd:config.base_dir+'/'+config.folders.proxy,detached:true});
+			ls.on('error', (err) => {
+			  logEvent(2, 'Failed to start child process.');
+			});
+			ls.on('close', (code) => {
+			  logEvent(1, "child process exited with code",code);
+			});
+		} else {
+			logEvent(2, "No internet detected, cannot revert_reset");
+		}
 	});
-	ls.on('close', (code) => {
-	  logEvent(1, "child process exited with code",code);
+
+}
+
+/**************************** INTERNET CONFIRM ********************************/
+
+function validate_internet(cb) {
+	logEvent(1, "Proxy validate internet");
+
+	exec('ping -c 1 -W 2 google.com', {timeout: 5000}, (error, stdout, stderr) => {
+		if (error) logEvent(2, 'ping exec error:', error);
+
+		var returnValue = "false";
+		if (stdout.indexOf("1 packets transmitted") > -1) returnValue = "true";
+		// logEvent(1, 'stdout:', stdout);
+		// logEvent(1, 'stderr:', stderr);
+
+		logEvent(1, "Internet Connected Check", returnValue);
+
+		if (cb) cb(null, returnValue);
 	});
 }
 

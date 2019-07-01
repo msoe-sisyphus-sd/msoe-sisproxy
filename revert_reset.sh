@@ -25,8 +25,7 @@ if [ -n "$1" ]; then
 else
 	git reset --hard
 fi
-rm -rf node_modules
-npm install
+sudo rm -rf node_modules
 
 # reset siscloud
 cd /home/pi/sisbot-server/siscloud
@@ -35,9 +34,21 @@ if [ -n "$2" ]; then
 else
 	git reset --hard
 fi
-rm -rf node_modules
-npm install
+sudo rm -rf node_modules
 
+# fix permissions
+chown -R pi /home/pi/sisbot-server/
+
+# reinstall node modules
+# cd /home/pi/sisbot-server/sisbot
+# su - pi -c npm install
+# cd /home/pi/sisbot-server/siscloud
+# su - pi -c npm install
+
+# fix permissions yet again
+# chown -R pi /home/pi/sisbot-server/
+
+# restart server
 cd /home/pi/sisbot-server/sisproxy
 sudo NODE_ENV=sisbot node server.js >> /var/log/sisyphus/proxy.log  2>&1
 
