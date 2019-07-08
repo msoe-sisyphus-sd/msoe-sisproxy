@@ -152,6 +152,7 @@ _.each(config.services, function (service, key) {
 		} else if (resp) {
 			logEvent(1, "Service created on port ", resp);
 
+			state[key].npm_revert = false;
 			state[key].npm_restart = false;
 			state[key].running = true;
 			save_services_state();
@@ -272,6 +273,20 @@ function revert(service) {
 	logEvent(1, "Revert", service);
 	var ls = exec('cd ' + config.base_dir + '/' + config.folders[service] + ' && git reset --hard', (error, stdout, stderr) => {
 		if (error) return logEvent(2, 'Revert error:',error);
+
+		// delete NODE_MODULES Folder if we already reverted
+		if (state[service] && state[service].npm_revert == true) {
+			var ls = exec('cd ' + config.base_dir + '/' + config.folders[service] + ' && rm -rf node_modules', (error, stdout, stderr) => {
+				logEvent(2, 'Already reverted, delete node_modules in '+service);
+
+				restart_node();
+			});
+			return;
+		}
+
+		// Save state
+		state[service].npm_revert = true;
+		save_services_state();
 
 		restart_node();
 	});
