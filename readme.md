@@ -65,8 +65,8 @@ git --work-tree=/services/<service_folder> --git-dir=/git/<reponame>.git checkou
 #### On Client
 git init
 
-git remote set-url <servername> engineering@sisyphus.withease.io:/git/<reponame>.git
+git remote set-url <servername> pi@sisyphus.withease.io:/git/<reponame>.git
 OR
-git remote add <servername> engineering@sisyphus.withease.io:/git/<reponame>.git
+git remote add <servername> pi@sisyphus.withease.io:/git/<reponame>.git
 
 git pull origin master
