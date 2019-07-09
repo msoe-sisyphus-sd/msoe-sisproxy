@@ -186,7 +186,11 @@ function reinstall_npm(service, key) {
 	// attempt to fix via npm install
 	var command = 'cd '+service.dir+' && sudo -u pi npm install && echo "Finished"';
 	logEvent(2, command);
-	execSync(command, {encoding:"utf8"});
+	try {
+		execSync(command, {encoding:"utf8"});
+	} catch(err) {
+		logEvent(2, "NPM Restart err", err);
+	}
 
 	// Save state
 	state[key].npm_restart = true;
