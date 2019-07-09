@@ -2,7 +2,7 @@ var _ = require('underscore');
 
 var config = {
     base: {
-        version: '1.4.2', // Rebuild missing node_module files, confirm internet before npm install, revert on bad/missing config files without wiping node_modules
+        version: '1.4.9', // Rebuild missing node_module files, confirm internet before npm install, revert on bad/missing config files without wiping node_modules
         include_https: true,
         port_ssl: 443,
         port_redirect: 80,
