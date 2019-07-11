@@ -2,7 +2,7 @@ var _ = require('underscore');
 
 var config = {
     base: {
-        version: '1.4.9', // Rebuild missing node_module files, confirm internet before npm install, revert on bad/missing config files without wiping node_modules
+        version: '1.4.11', // Move tables over to webcenter
         include_https: true,
         port_ssl: 443,
         port_redirect: 80,
@@ -206,7 +206,7 @@ var config = {
                     connect: ['api']
                 },
                 api: {
-                    address: 'sisyphus.withease.io',
+                    address: 'webcenter.sisyphus-industries.com',
                     port: 3005,
                     ansible_port: 8092,
                     is_register: true,
