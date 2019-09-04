@@ -31,12 +31,7 @@ if (config.folders.logs) {
 		} catch(err) {
 			logEvent(2, "Proxy.log error", err);
 		}
-		// var file = fs.readFileSync(config.folders.logs+'proxy.log', 'utf8');
-		// if (file) {
-		// 	fs.appendFileSync(config.folders.logs + moment().format('YYYYMMDD') + "_proxy.log", fs.readFileSync(config.folders.logs+"proxy.log"));
-		// 	// fs.unlinkSync(config.folders.logs+"/proxy.log");
 		fs.writeFileSync(config.folders.logs+'proxy.log', "");
-		// }
 	}
 }
 
