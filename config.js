@@ -2,7 +2,7 @@ var _ = require('underscore');
 
 var config = {
     base: {
-        version: '1.4.11', // Move tables over to webcenter
+        version: '1.3.12', // Fix moving of proxy.log to dated file
         include_https: true,
         port_ssl: 443,
         port_redirect: 80,

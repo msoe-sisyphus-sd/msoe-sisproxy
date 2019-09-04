@@ -25,12 +25,18 @@ if (config.folders.logs) {
 
 	// if proxy.log exists, and is not empty append to today's date
 	if (fs.existsSync(config.folders.logs+"proxy.log")) {
-		var file = fs.readFileSync(config.folders.logs+'proxy.log', 'utf8');
-		if (file) {
-			fs.appendFileSync(config.folders.logs + moment().format('YYYYMMDD') + "_proxy.log", fs.readFileSync(config.folders.logs+"proxy.log"));
-			// fs.unlinkSync(config.folders.logs+"/proxy.log");
-			fs.writeFileSync(config.folders.logs+'proxy.log', "");
+		try {
+			var command = 'cat '+config.folders.logs+'proxy.log >> '+config.folders.logs + moment().format('YYYYMMDD') + '_proxy.log';
+			var resp = execSync(command, {encoding:"utf8"});
+		} catch(err) {
+			logEvent(2, "Proxy.log error", err);
 		}
+		// var file = fs.readFileSync(config.folders.logs+'proxy.log', 'utf8');
+		// if (file) {
+		// 	fs.appendFileSync(config.folders.logs + moment().format('YYYYMMDD') + "_proxy.log", fs.readFileSync(config.folders.logs+"proxy.log"));
+		// 	// fs.unlinkSync(config.folders.logs+"/proxy.log");
+		fs.writeFileSync(config.folders.logs+'proxy.log', "");
+		// }
 	}
 }
 
