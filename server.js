@@ -3,15 +3,15 @@ var http        = require('http');
 var tls         = require("tls");
 var fs          = require("fs");
 var httpProxy   = require('http-proxy');
-var exec 				= require('child_process').exec;
-var execSync		= require('child_process').execSync;
-var spawn 			= require('child_process').spawn;
+var exec 		= require('child_process').exec;
+var execSync	= require('child_process').execSync;
+var spawn 		= require('child_process').spawn;
 var express     = require('express');
 var bodyParser	= require('body-parser');
 var config      = require('./config.js');
 var _           = require('underscore');
-var moment 			= require('moment');
-var ansible 		= require('./ansible.js');
+var moment 		= require('moment');
+var ansible 	= require('./ansible.js');
 var used_ports  = [];
 
 /* ---------------- Logging ------------- */
@@ -25,12 +25,18 @@ if (config.folders.logs) {
 
 	// if proxy.log exists, and is not empty append to today's date
 	if (fs.existsSync(config.folders.logs+"proxy.log")) {
-		var file = fs.readFileSync(config.folders.logs+'proxy.log', 'utf8');
-		if (file) {
-			fs.appendFileSync(config.folders.logs + moment().format('YYYYMMDD') + "_proxy.log", fs.readFileSync(config.folders.logs+"proxy.log"));
-			// fs.unlinkSync(config.folders.logs+"/proxy.log");
-			fs.writeFileSync(config.folders.logs+'proxy.log', "");
+		try {
+			var command = 'cat '+config.folders.logs+'proxy.log >> '+config.folders.logs + moment().format('YYYYMMDD') + '_proxy.log';
+			var resp = execSync(command, {encoding:"utf8"});
+		} catch(err) {
+			logEvent(2, "Proxy.log error", err);
 		}
+		// var file = fs.readFileSync(config.folders.logs+'proxy.log', 'utf8');
+		// if (file) {
+		// 	fs.appendFileSync(config.folders.logs + moment().format('YYYYMMDD') + "_proxy.log", fs.readFileSync(config.folders.logs+"proxy.log"));
+		// 	// fs.unlinkSync(config.folders.logs+"/proxy.log");
+		fs.writeFileSync(config.folders.logs+'proxy.log', "");
+		// }
 	}
 }
 

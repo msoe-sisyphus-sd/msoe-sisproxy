@@ -2,7 +2,7 @@ var _ = require('underscore');
 
 var config = {
     base: {
-        version: '1.4.11', // Move tables over to webcenter
+        version: '1.4.12', // Fix moving of proxy.log to dated file
         include_https: true,
         port_ssl: 443,
         port_redirect: 80,
@@ -258,7 +258,7 @@ var config = {
             cloud: 'app',
             api: 'api',
             sisbot: 'sisbot',
-            proxy: 'proxy',
+            proxy: 'sisproxy',
             app: 'siscloud'
         },
         servers: function() {
