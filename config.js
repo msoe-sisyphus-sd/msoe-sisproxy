@@ -258,7 +258,7 @@ var config = {
             cloud: 'app',
             api: 'api',
             sisbot: 'sisbot',
-            proxy: 'proxy',
+            proxy: 'sisproxy',
             app: 'siscloud'
         },
         servers: function() {
