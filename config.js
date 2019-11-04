@@ -215,7 +215,8 @@ var config = {
       api: 'api',
       sisbot: 'sisbot',
       proxy: 'sisproxy',
-      app: 'siscloud'
+      app: 'siscloud',
+      training: 'training_grounds'
     },
     servers: function() {
       return {
