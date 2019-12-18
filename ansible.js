@@ -6,7 +6,7 @@ var uuid				= require('uuid');
 
 var Ansible = function() {
 	return {
-		debug			: true,
+		debug			: false,
 		sockets			: {},
 		service			: null,
 		_handler		: {},
