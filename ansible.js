@@ -1,12 +1,12 @@
-var _				= require("underscore");
-var fs				= require('fs');
-var tls				= require("tls");
-var JsonSocket		= require('json-socket');
-var uuid			= require('uuid');
+var _						= require("underscore");
+var fs					= require('fs');
+var tls					= require("tls");
+var JsonSocket	= require('json-socket');
+var uuid				= require('uuid');
 
 var Ansible = function() {
 	return {
-		debug			: false,
+		debug			: true,
 		sockets			: {},
 		service			: null,
 		_handler		: {},
@@ -114,13 +114,12 @@ var Ansible = function() {
 					setTimeout(function(){
 						service_obj.reconnect++;
 						delete service_obj.socket;
+						self.logEvent(0, "Ansible reconnect", service, Object.keys(self.sockets).length);
 						self.connect(service, service_obj.address, service_obj.port, cb); // allows for address to be changed by handler
 					},5000);
 				} else {
 					self.logEvent(1, "Ansible disconnect", service, Object.keys(self.sockets).length);
-
-					// disconnect, forget socket
-					delete self.sockets[service];
+					if (self.disconnect(service)) delete self.sockets[service];
 				}
 			});
 			json_socket.on('message',function(message) {
@@ -142,7 +141,9 @@ var Ansible = function() {
 							}
 						});
 					} catch(err) {
-						return self.logEvent(2, "Outgoing Handler error", message, err);
+						var response = { service: service, data: null, err: 'Method error', _id: message._id };
+						self.respond(response);
+						return console.log("Handler error", err);
 					}
 				}
 				// call any listener method saved
@@ -158,16 +159,16 @@ var Ansible = function() {
 			// save to list
 			if (this.sockets[service] == undefined) {
 				var socket_obj = {
-					socket				: json_socket,
-					service				: service,
-					address				: address,
-					port				: port,
+					socket					:	json_socket,
+					service					: service,
+					address					: address,
+					port						: port,
 					is_connected		: false,
-					type				: "client",
-					messages			: [],
-					message_handler		: (self._handler) ? self._handler : null, // object to call functions when messages come in
+					type						: "client",
+					messages				: [],
+					message_handler	: (self._handler) ? self._handler : null, // object to call functions when messages come in
 					maintain_conn		: true,
-					reconnect			: 0
+					reconnect				: 0
 				};
 				this.sockets[service] = socket_obj;
 			} else {
@@ -240,7 +241,9 @@ var Ansible = function() {
 								}
 							});
 						} catch(err) {
-							return self.logEvent(2, "Handler error", err);
+							var response = { service: socket_obj.service, data: null, err: 'Method error', _id: message._id };
+							self.respond(response);
+							return console.log("Handler error", err);
 						}
 					}
 

@@ -2,7 +2,7 @@ var _ = require('underscore');
 
 var config = {
   base: {
-    version: '1.4.12', // Fix moving of proxy.log to dated file
+    version: '1.4.13', // Send error response if ansible method fails
     include_https: true,
     port_ssl: 443,
     port_redirect: 80,
@@ -254,7 +254,34 @@ var config = {
       logs: '/Users/mattfox12/Documents/Sodo/Ease/Sisyphus/logs'
     },
     base_dir: '/Users/mattfox12/Documents/Sodo/Ease/Sisyphus',
-    base_certs: '/Users/mattfox12/Documents/Sodo/Ease/Sisyphus/proxy/certs/',
+    base_certs: '/Users/mattfox12/Documents/Sodo/Ease/Sisyphus/proxy/certs/'
+  },
+  wc: {
+    services: function() {
+      return {
+        app: {
+          dir: this.base_dir + '/' + this.folders.app,
+          address: 'localhost',
+          port: 3001,
+          has_server: true
+        },
+        sisbot: {
+          dir: this.base_dir + '/' + this.folders.sisbot,
+          address: 'localhost',
+          port: 3002,
+          ansible_port: 8091,
+          connect: ['api']
+        },
+        api: {
+          address: '192.168.86.20',
+          // address: '54.237.23.209',
+          port: 3005,
+          ansible_port: 8092,
+          is_register: true,
+          connect: []
+        }
+      }
+    }
   },
   debug: {
     debug: true

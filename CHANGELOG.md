@@ -1,3 +1,6 @@
+# 2019-12-17 1.4.13
+ - Send error response if ansible method fails
+
 # 2019-09-04 1.4.12
  - Fix moving of proxy.log on restart which prevents crashes on extra long proxy.log files
 
