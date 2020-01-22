@@ -50,7 +50,7 @@ var logEvent = function() {
 	console.log(line);
 }
 
-logEvent(1, "Proxy Start");
+logEvent(1, "Proxy Start", process.env.NODE_ENV);
 
 /**************************** PROXY *******************************************/
 
