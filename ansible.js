@@ -114,7 +114,7 @@ var Ansible = function() {
 					setTimeout(function(){
 						service_obj.reconnect++;
 						delete service_obj.socket;
-						self.logEvent(0, "Ansible reconnect", service, Object.keys(self.sockets).length);
+						self.logEvent(1, "Ansible reconnect", service, Object.keys(self.sockets).length);
 						self.connect(service, service_obj.address, service_obj.port, cb); // allows for address to be changed by handler
 					},5000);
 				} else {
@@ -143,7 +143,7 @@ var Ansible = function() {
 					} catch(err) {
 						var response = { service: service, data: null, err: 'Method error', _id: message._id };
 						self.respond(response);
-						return console.log("Handler error", err);
+						return self.logEvent(2, "Handler error", err);
 					}
 				}
 				// call any listener method saved
@@ -243,7 +243,7 @@ var Ansible = function() {
 						} catch(err) {
 							var response = { service: socket_obj.service, data: null, err: 'Method error', _id: message._id };
 							self.respond(response);
-							return console.log("Handler error", err);
+							return self.logEvent(2, "Handler error", err);
 						}
 					}
 
