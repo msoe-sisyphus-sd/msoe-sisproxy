@@ -191,7 +191,6 @@ function create_service(service,cb) {
 }
 
 function reinstall_npm(service, key) {
-	return;
 	if (process.env.NODE_ENV.indexOf('dev') != -1) return; // skip
 	logEvent(2, "NPM Restart");
 
@@ -311,7 +310,6 @@ function restart_node() {
 }
 
 function revert(service) {
-	return;
 	if (process.env.NODE_ENV.indexOf('sisbot') < 0) return; // skip
 	if (process.env.NODE_ENV.indexOf('dev') > -1) return; // skip dev
 
@@ -338,7 +336,6 @@ function revert(service) {
 }
 
 function revert_reset() {
-	return;
 	if (process.env.NODE_ENV.indexOf('sisbot') < 0) return; // skip
 	if (process.env.NODE_ENV.indexOf('dev') > -1) return; // skip dev
 
@@ -427,32 +424,32 @@ if (config.include_https) {
 
 /****** REDIRECT SERVER ******/
 http.createServer(function (request, response) {
-    var domain_origin  = "";
-    if (request.headers.host) {
-    	domain_origin  =	request.headers.host.replace(/\:[0-9]{4}/gi, '');
-    }
-		domain = domain_origin;
+  var domain_origin  = "";
+  if (request.headers.host) {
+  	domain_origin  =	request.headers.host.replace(/\:[0-9]{4}/gi, '');
+  }
+	domain = domain_origin;
 
-		// logEvent(1, "Domain", domain);
+	// logEvent(1, "Domain", domain);
 
-		if (!config.services[domain]) domain = domain_origin.substring(0,domain_origin.indexOf('.'));
-		var suffix_domain = request.url.split("/")[1];
-		if (!config.services[domain] && config.services[suffix_domain]) domain = suffix_domain;
-		if (!config.services[domain]) domain = config.default_server;
+	if (!config.services[domain]) domain = domain_origin.substring(0,domain_origin.indexOf('.'));
+	var suffix_domain = request.url.split("/")[1];
+	if (!config.services[domain] && config.services[suffix_domain]) domain = suffix_domain;
+	if (!config.services[domain]) domain = config.default_server;
 
-		try {
-			var ignore_urls = ['/sisbot/state','/sisbot/connect','/sisbot/exists'];
+	try {
+		var ignore_urls = ['/sisbot/state','/sisbot/connect','/sisbot/exists'];
 
-	    var m = request.url.match("/api/");
-	    // logEvent(1,"proxy process.env.NODE_ENV ", process.env.NODE_ENV);
+    var m = request.url.match("/api/");
+    // logEvent(1,"proxy process.env.NODE_ENV ", process.env.NODE_ENV);
 
-	    if (process.env.NODE_ENV.indexOf('sisbot') > -1 && m != null) {
-		  	logEvent(1,"Sisproxy got an api request, ignoring ",request.url);
-		  } else {
-  			if (ignore_urls.indexOf(request.url) < 0) logEvent(1, "SisProxy HTTP 80 Request:", domain, request.url);
-	  		proxy.web(request, response, { target: 'http://127.0.0.1:' + config.services[domain].port, secure: false });
-		  }
-		}catch (err) {
-			logEvent(2, "SisProxy Redirect Err", err);
-		}
+    if (process.env.NODE_ENV.indexOf('sisbot') > -1 && m != null) {
+	  	logEvent(1,"Sisproxy got an api request, ignoring ",request.url);
+	  } else {
+			if (ignore_urls.indexOf(request.url) < 0) logEvent(1, "SisProxy HTTP 80 Request:", domain, request.url);
+  		proxy.web(request, response, { target: 'http://127.0.0.1:' + config.services[domain].port, secure: false });
+	  }
+	}catch (err) {
+		logEvent(2, "SisProxy Redirect Err", err);
+	}
 }).listen(config.port_redirect);
