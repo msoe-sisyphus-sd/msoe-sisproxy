@@ -2,7 +2,7 @@ var _ = require('underscore');
 
 var config = {
   base: {
-    version: '1.4.13', // Send error response if ansible method fails
+    version: '1.3.14', // Recovery_update
     include_https: true,
     port_ssl: 443,
     port_redirect: 80,
@@ -82,6 +82,8 @@ var config = {
     },
     base_dir: '/home/pi/sisbot-server',
     base_certs: '/home/pi/sisbot-server/sisproxy/certs',
+    recovery_dir: '/home/pi/sis_recovery',
+    recovery_v: 1004017, // change this to higher number if we change recovery_archiveUpdate.sh
     servers: function() {
       return {
         app: {

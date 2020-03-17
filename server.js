@@ -45,9 +45,18 @@ var logEvent = function() {
 		else line += "\t"+obj;
 	});
 
-	// save to the log file for sisbot
-	if (arguments[0] == 2 || arguments[0] == '2') line = '\x1b[31m'+line+'\x1b[0m';
-	console.log(line);
+	// save to the log file
+	if (process.env.NODE_ENV != undefined) {
+    if (process.env.NODE_ENV.indexOf('_dev') >= 0) {
+      if (arguments[0] == 0 || arguments[0] == '0') line = '\x1b[32m'+line+'\x1b[0m'; // Green
+      if (arguments[0] == 2 || arguments[0] == '2') line = '\x1b[31m'+line+'\x1b[0m'; // Red
+  		console.log(line);
+    } else {
+			console.log(line);
+		}
+  } else {
+		console.log(line);
+	}
 }
 
 logEvent(1, "Proxy Start", process.env.NODE_ENV);
@@ -182,6 +191,7 @@ function create_service(service,cb) {
 }
 
 function reinstall_npm(service, key) {
+	return;
 	if (process.env.NODE_ENV.indexOf('dev') != -1) return; // skip
 	logEvent(2, "NPM Restart");
 
@@ -224,8 +234,10 @@ function git_state() {
 	if (process.env.NODE_ENV.indexOf('sisbot') < 0) return; // skip
 	if (process.env.NODE_ENV.indexOf('dev') != -1) return; // skip
 
+	logEvent(1, "Git State", state.sisbot.running, state.app.running);
 	if (state.sisbot.running && state.app.running) {
-		// logEvent(1, "Git State", state.sisbot.running, state.app.running);
+		logEvent(1, "Stable Git State", state.sisbot.running, state.app.running);
+
 		exec('cd '+config.base_dir+'/sisbot && git log -1 --stat', (error, stdout, stderr) => {
 			if (error) return logEvent(2, 'exec error:',error);
 
@@ -250,6 +262,32 @@ function git_state() {
 				save_services_state();
 			}
 		});
+
+		// run recovery_archiveUpdate.sh if needed
+		var update_archive = false;
+		logEvent(0, "Backup Check");
+		// check if we need to update the archive
+		if (fs.existsSync(config.recovery_dir+'/protected_backup/backup_v')) {
+			try {
+				var archived_v = fs.readFileSync(config.recovery_dir+'/protected_backup/backup_v', 'utf8');
+				if (archived_v && config.recovery_v > +archived_v) update_archive = true;
+			} catch(err) {
+				logEvent(2, "backup_v error", err);
+			}
+		} else update_archive = true;
+
+		if (update_archive) {
+			logEvent(0, "Run recovery_archiveUpdate");
+			var ls = spawn('./recovery_archiveUpdate.sh',[],{cwd:config.base_dir+'/'+config.folders.proxy,detached:true,stdio:'ignore'});
+			ls.on('error', (err) => {
+			  logEvent(2, 'Failed to start recovery_archiveUpdate.');
+			});
+			ls.on('close', (code) => {
+			  logEvent(1, "recovery_archiveUpdate exited with code", code);
+				// save backup_v
+				if (code == 0) fs.writeFileSync(config.recovery_dir+'/protected_backup/backup_v', config.recovery_v);
+			});
+		}
 	}
 }
 
@@ -273,6 +311,7 @@ function restart_node() {
 }
 
 function revert(service) {
+	return;
 	if (process.env.NODE_ENV.indexOf('sisbot') < 0) return; // skip
 	if (process.env.NODE_ENV.indexOf('dev') > -1) return; // skip dev
 
@@ -299,6 +338,7 @@ function revert(service) {
 }
 
 function revert_reset() {
+	return;
 	if (process.env.NODE_ENV.indexOf('sisbot') < 0) return; // skip
 	if (process.env.NODE_ENV.indexOf('dev') > -1) return; // skip dev
 

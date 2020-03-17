@@ -37,7 +37,7 @@ fi
 sudo rm -rf node_modules
 
 # fix permissions
-chown -R pi /home/pi/sisbot-server/
+chown -R pi:pi /home/pi/sisbot-server/
 
 # reinstall node modules
 # cd /home/pi/sisbot-server/sisbot
