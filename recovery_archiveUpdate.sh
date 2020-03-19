@@ -1,10 +1,20 @@
 #!/usr/bin/env bash
 
-# kill node application
-# sudo killall node
+# create sis_recovery if not there
+if [ ! -d "/home/pi/sis_recovery" ]; then
+  echo "sis_recovery does not exist"
+  mkdir -R /home/pi/sis_recovery
+  cp -r /home/pi/sisbot-server/sisproxy/recovery_scripts /home/pi/sis_recovery/scripts
+  sudo chown -R pi:pi /home/pi/sis_recovery
+
+  # update startup check
+  cd /etc/init.d
+  sudo ln -s /home/pi/sis_recovery/scripts/recovery_check.sh sis_recovery_check
+  sudo update-rc.d -f sis_recovery_check defaults
+fi
 
 # create directories to be archived
-mkdir /home/pi/sis_recovery/protected_backup/recovery
+mkdir -R /home/pi/sis_recovery/protected_backup/recovery
 
 # copy sisbot
 cp -rp /home/pi/sisbot-server/sisbot /home/pi/sis_recovery/protected_backup/recovery/sisbot
@@ -25,7 +35,9 @@ git reset --hard
 cd /home/pi/sis_recovery/protected_backup
 
 # delete old archive
-sudo rm recovery.tar.gz
+if [ -f "recovery.tar.gz" ]; then
+  sudo rm recovery.tar.gz
+fi
 
 # create new archive
 sudo tar cvzf recovery.tar.gz recovery
