@@ -11,6 +11,9 @@ if [ ! -d "/home/pi/sis_recovery" ]; then
   cd /etc/init.d
   sudo ln -s /home/pi/sis_recovery/scripts/recovery_check.sh sis_recovery_check
   sudo update-rc.d -f sis_recovery_check defaults
+else
+  echo "update sis_recovery"
+  cp /home/pi/sisbot-server/sisproxy/recovery_scripts/recovery_check.sh /home/pi/sis_recovery/scripts/
 fi
 
 echo "update archive"

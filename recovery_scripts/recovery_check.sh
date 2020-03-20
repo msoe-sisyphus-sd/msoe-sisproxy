@@ -21,18 +21,18 @@ gpio_setup(){
 	echo out > /sys/class/gpio/gpio$GPIO_LED_RED/direction
 	echo out > /sys/class/gpio/gpio$GPIO_LED_GRN/direction
 
-        # Set the pin values. Both LEDs off.
-        echo $GPIO_OFF > /sys/class/gpio/gpio$GPIO_LED_RED/value
-        echo $GPIO_OFF > /sys/class/gpio/gpio$GPIO_LED_GRN/value
+  # Set the pin values. Both LEDs off.
+  echo $GPIO_OFF > /sys/class/gpio/gpio$GPIO_LED_RED/value
+  echo $GPIO_OFF > /sys/class/gpio/gpio$GPIO_LED_GRN/value
 
 	echo "GPIO SETUP COMPLETE"
 }
 
 ################################################################################
 gpio_release(){
-        echo $GPIO_RESET_SW > /sys/class/gpio/unexport
-        echo $GPIO_LED_RED > /sys/class/gpio/unexport
-        echo $GPIO_LED_GRN  > /sys/class/gpio/unexport
+  echo $GPIO_RESET_SW > /sys/class/gpio/unexport
+  echo $GPIO_LED_RED > /sys/class/gpio/unexport
+  echo $GPIO_LED_GRN  > /sys/class/gpio/unexport
 
 	echo "GPIO SETUP RELEASED"
 }
@@ -44,7 +44,7 @@ check_for_reset_request(){
 
 	# Check if the Reset switch is pressed
 	if [ `cat /sys/class/gpio/gpio2/value` -eq 0 ]
-        then
+  then
 		return_val=0
 	fi
 
@@ -56,14 +56,15 @@ check_for_reset_request(){
 shutdown_sis_software(){
 
 	# kill running node processes
+	echo "Kill node processes" >> /var/log/sisyphus/recovery.log
 	ps aux | grep " server.js" | grep -v grep
 	nodepids=$(ps aux | grep " server.js" | grep -v grep | cut -c10-15)
-	
+
 	# echo "OK, so we will stop these process/es now..."
 	for nodepid in ${nodepids[@]}
 	do
-	echo "Stopping PID :"$nodepid >> restart.log
-	kill -9 $nodepid
+		echo "Stopping PID :"$nodepid >> /var/log/sisyphus/recovery.log
+		kill -9 $nodepid
 	done
 
 	# remove log folder
@@ -71,8 +72,8 @@ shutdown_sis_software(){
 	#rm -rf sisyphus
 
 	# remove status
-	cd /home/pi/sisbot-server/sisbot/content/
-	rm status.json
+	# cd /home/pi/sisbot-server/sisbot/content/
+	# rm status.json
 
 	# reset rc.local
 	#echo -e "#!/bin/sh -e\ncd /home/pi/sisbot-server/sisproxy && git reset --hard && NODE_ENV=sisbot node server.js &\nexit 0\n" > /etc/rc.local
@@ -83,58 +84,66 @@ shutdown_sis_software(){
 resetup_sis_software(){
 
 	# reset hostname
+	echo "Reset hostname" >> /var/log/sisyphus/recovery.log
 	cd /home/pi/sisbot-server/sisbot
 	./set_hostname.sh Sisyphus
-
 
 }
 
 ################################################################################
 sisyphus_recovery_procedure(){
 
-	echo "RECOVEY IN PROCESS"
+	echo "RECOVERY IN PROCESS" >> /var/log/sisyphus/recovery.log
 
 	# Kill all running processes
 	shutdown_sis_software
 
 	# Remove the current directories
+	echo "Remove current directories" >> /var/log/sisyphus/recovery.log
 	rm -rf /home/pi/sisbot-server/sisbot
 	rm -rf /home/pi/sisbot-server/siscloud
 	rm -rf /home/pi/sisbot-server/sisproxy
-	
-	# Untar the recoery files 
+
+	# Untar the recovery files
+	echo "Untar recovery files" >> /var/log/sisyphus/recovery.log
 	cd /home/pi/sis_recovery/protected_backup
 	tar xf recovery.tar.gz
 
 	# Copy the recovery copies into place
+	echo "Restore sisbot" >> /var/log/sisyphus/recovery.log
 	cp -rp /home/pi/sis_recovery/protected_backup/recovery/sisbot /home/pi/sisbot-server/sisbot
+	echo "Restore siscloud" >> /var/log/sisyphus/recovery.log
 	cp -rp /home/pi/sis_recovery/protected_backup/recovery/siscloud /home/pi/sisbot-server/siscloud
+	echo "Restore sisproxy" >> /var/log/sisyphus/recovery.log
 	cp -rp /home/pi/sis_recovery/protected_backup/recovery/sisproxy /home/pi/sisbot-server/sisproxy
 
 	# Remove the recovery source
+	echo "Remove recovery" >> /var/log/sisyphus/recovery.log
 	rm -rf /home/pi/sis_recovery/protected_backup/recovery
 
 	# Re-setup software
 	resetup_sis_software
 
 	# Stop the LED flash
-	kill $pid_flash	
-        sleep 0.25
-        echo $GPIO_OFF > /sys/class/gpio/gpio$GPIO_LED_RED/value       
+	kill $pid_flash
+  sleep 0.25
+  echo $GPIO_OFF > /sys/class/gpio/gpio$GPIO_LED_RED/value
 
 	#Setup the interfaces file for hostspot mode
+	echo "Reset network interfaces" >> /var/log/sisyphus/recovery.log
 	cp /etc/network/interfaces.hotspot /etc/network/interfaces
 
 	#Set the green LED
 	echo $GPIO_ON > /sys/class/gpio/gpio$GPIO_LED_GRN/value
 
-	echo "RECOVERY COMPLETE"
+	echo "RECOVERY COMPLETE" >> /var/log/sisyphus/recovery.log
 	sleep 10
 
 	#Clear the gleen LED
 	echo $GPIO_OFF > /sys/class/gpio/gpio$GPIO_LED_GRN/value
 
 	# Reboot the Pi to restart the software
+	echo "Reboot..." >> /var/log/sisyphus/recovery.log
 	reboot
 }
 
@@ -155,8 +164,8 @@ then
 	/home/pi/sis_recovery/scripts/flash.sh & pid_flash=$!
 
 	# Kick off recovery procedure
-        sisyphus_recovery_procedure
-	
+  sisyphus_recovery_procedure
+
 	# Stop the LED flashing
 	kill $pid_flash
 
