@@ -111,11 +111,11 @@ sisyphus_recovery_procedure(){
 
 	# Copy the recovery copies into place
 	echo "Restore sisbot" >> /var/log/sisyphus/recovery.log
-	sudo mv /home/pi/sis_recovery/protected_backup/recovery/sisbot /home/pi/sisbot-server/
+	sudo mv /home/pi/sis_recovery/protected_backup/recovery/sisbot /home/pi/sisbot-server/ || echo "Sisbot mv error" >> /var/log/sisyphus/recovery.log
 	echo "Restore siscloud" >> /var/log/sisyphus/recovery.log
-	sudo mv /home/pi/sis_recovery/protected_backup/recovery/siscloud /home/pi/sisbot-server/
+	sudo mv /home/pi/sis_recovery/protected_backup/recovery/siscloud /home/pi/sisbot-server/ || echo "Siscloud mv error" >> /var/log/sisyphus/recovery.log
 	echo "Restore sisproxy" >> /var/log/sisyphus/recovery.log
- 	sudo mv /home/pi/sis_recovery/protected_backup/recovery/sisproxy /home/pi/sisbot-server/
+ 	sudo mv /home/pi/sis_recovery/protected_backup/recovery/sisproxy /home/pi/sisbot-server/ || echo "Sisproxy mv error" >> /var/log/sisyphus/recovery.log
 
 	# Remove the recovery source
 	echo "Remove recovery" >> /var/log/sisyphus/recovery.log
@@ -161,7 +161,7 @@ check_for_reset_request
 if [ $? -eq 0 ]
 then
 	# Begin the LED flash to indicate recovery in process
-	/home/pi/sis_recovery/scripts/flash.sh & pid_flash=$!
+	# /home/pi/sis_recovery/scripts/flash.sh & pid_flash=$!
 
 	# Kick off recovery procedure
   sisyphus_recovery_procedure
