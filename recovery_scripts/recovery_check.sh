@@ -107,22 +107,22 @@ sisyphus_recovery_procedure(){
 	# Untar the recovery files
 	echo "Untar recovery files" >> /var/log/sisyphus/recovery.log
 	cd /home/pi/sis_recovery/protected_backup
-	tar xf recovery.tar.gz
+	tar xf recovery.tar.gz -C /home/pi/sisbot-server/
 
 	# Copy the recovery copies into place
-	echo "Restore sisbot" >> /var/log/sisyphus/recovery.log
-	sudo mv /home/pi/sis_recovery/protected_backup/recovery/sisbot /home/pi/sisbot-server/ || echo "Sisbot mv error" >> /var/log/sisyphus/recovery.log
-	echo "Restore siscloud" >> /var/log/sisyphus/recovery.log
-	sudo mv /home/pi/sis_recovery/protected_backup/recovery/siscloud /home/pi/sisbot-server/ || echo "Siscloud mv error" >> /var/log/sisyphus/recovery.log
-	echo "Restore sisproxy" >> /var/log/sisyphus/recovery.log
- 	sudo mv /home/pi/sis_recovery/protected_backup/recovery/sisproxy /home/pi/sisbot-server/ || echo "Sisproxy mv error" >> /var/log/sisyphus/recovery.log
+	# echo "Restore sisbot" >> /var/log/sisyphus/recovery.log
+	# sudo mv /home/pi/sis_recovery/protected_backup/recovery/sisbot /home/pi/sisbot-server/ || echo "Sisbot mv error" >> /var/log/sisyphus/recovery.log
+	# echo "Restore siscloud" >> /var/log/sisyphus/recovery.log
+	# sudo mv /home/pi/sis_recovery/protected_backup/recovery/siscloud /home/pi/sisbot-server/ || echo "Siscloud mv error" >> /var/log/sisyphus/recovery.log
+	# echo "Restore sisproxy" >> /var/log/sisyphus/recovery.log
+ 	# sudo mv /home/pi/sis_recovery/protected_backup/recovery/sisproxy /home/pi/sisbot-server/ || echo "Sisproxy mv error" >> /var/log/sisyphus/recovery.log
+
+	# Remove the status file
+	rm /home/pi/sisbot-server/sisbot/content/status.json
 
 	# Remove the recovery source
 	echo "Remove recovery" >> /var/log/sisyphus/recovery.log
 	rm -rf /home/pi/sis_recovery/protected_backup/recovery
-
-	# Re-setup software
-	resetup_sis_software
 
 	# Stop the LED flash
 	kill $pid_flash
@@ -136,6 +136,9 @@ sisyphus_recovery_procedure(){
 	#Set the green LED
 	echo $GPIO_ON > /sys/class/gpio/gpio$GPIO_LED_GRN/value
 
+	# Reset Table name
+	resetup_sis_software
+
 	echo "RECOVERY COMPLETE" >> /var/log/sisyphus/recovery.log
 	sleep 10
 
@@ -144,7 +147,7 @@ sisyphus_recovery_procedure(){
 
 	# Reboot the Pi to restart the software
 	echo "Reboot..." >> /var/log/sisyphus/recovery.log
-	reboot
+	sudo reboot
 }
 
 
@@ -161,7 +164,7 @@ check_for_reset_request
 if [ $? -eq 0 ]
 then
 	# Begin the LED flash to indicate recovery in process
-	# /home/pi/sis_recovery/scripts/flash.sh & pid_flash=$!
+	/home/pi/sis_recovery/scripts/flash.sh & pid_flash=$!
 
 	# Kick off recovery procedure
   sisyphus_recovery_procedure

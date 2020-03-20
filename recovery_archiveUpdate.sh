@@ -47,7 +47,8 @@ fi
 
 # create new archive
 echo "Make new archive"
-sudo tar cvzf recovery.tar.gz recovery > /dev/null
+cd /home/pi/sis_recovery/protected_backup/recovery/
+sudo tar cvzf recovery.tar.gz ./* > /dev/null
 
 cd /home/pi
 
