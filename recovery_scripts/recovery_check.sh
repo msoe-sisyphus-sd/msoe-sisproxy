@@ -93,7 +93,8 @@ resetup_sis_software(){
 ################################################################################
 sisyphus_recovery_procedure(){
 
-	echo "RECOVERY IN PROCESS" >> /var/log/sisyphus/recovery.log
+	now=$(date +"%T")
+	echo "RECOVERY IN PROCESS: $now" >> /var/log/sisyphus/recovery.log
 
 	# Kill all running processes
 	shutdown_sis_software
