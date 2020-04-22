@@ -93,7 +93,7 @@ resetup_sis_software(){
 ################################################################################
 sisyphus_recovery_procedure(){
 
-	now=$(date +"%T")
+	now=$(date +"%D %T")
 	echo "RECOVERY IN PROCESS: $now" >> /var/log/sisyphus/recovery.log
 
 	# Kill all running processes
@@ -143,8 +143,9 @@ sisyphus_recovery_procedure(){
 	echo "RECOVERY COMPLETE" >> /var/log/sisyphus/recovery.log
 	sleep 10
 
-	#Clear the gleen LED
-	echo $GPIO_OFF > /sys/class/gpio/gpio$GPIO_LED_GRN/value
+	#Clear the green LED
+	echo "Green LED off" >> /var/log/sisyphus/recovery.log
+  echo $GPIO_OFF > /sys/class/gpio/gpio$GPIO_LED_GRN/value
 
 	# Reboot the Pi to restart the software
 	echo "Reboot..." >> /var/log/sisyphus/recovery.log
