@@ -3,6 +3,7 @@ var fs					= require('fs');
 var tls					= require("tls");
 var JsonSocket	= require('json-socket');
 var uuid				= require('uuid');
+var moment			= require('moment');
 
 var Ansible = function() {
 	return {
@@ -22,7 +23,7 @@ var Ansible = function() {
 		logEvent: function() {
 			// var filename = '/var/log/sisyphus/ansible.log';
 
-			var line = Date.now();
+			var line = moment().format('YYYYMMDD HH:mm:ss Z');
 			_.each(arguments, function(obj, index) {
 				if (_.isObject(obj)) line += "\t"+JSON.stringify(obj);
 				else line += "\t"+obj;
