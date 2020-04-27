@@ -122,8 +122,8 @@ sisyphus_recovery_procedure(){
 	rm /home/pi/sisbot-server/sisbot/content/status.json
 
 	# Remove the recovery source
-	echo "Remove recovery" >> /var/log/sisyphus/recovery.log
-	rm -rf /home/pi/sis_recovery/protected_backup/recovery
+	# echo "Remove recovery" >> /var/log/sisyphus/recovery.log
+	# rm -rf /home/pi/sis_recovery/protected_backup/recovery
 
 	# Stop the LED flash
 	kill $pid_flash
