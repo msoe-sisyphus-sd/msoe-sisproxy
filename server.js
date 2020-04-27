@@ -314,11 +314,24 @@ function revert(service) {
 	if (process.env.NODE_ENV.indexOf('dev') > -1) return; // skip dev
 
 	logEvent(1, "Revert", service);
+
+	// TODO: if .git/index.lock exists, delete it rm .git/index.lock
+	if (fs.existsSync(config.base_dir + '/' + config.folders[service] + "/.git/index.lock")) {
+		logEvent(2, "git locked, remove lock", service);
+		try {
+			var command = 'rm '+config.base_dir + '/' + config.folders[service] + '/.git/index.lock';
+			execSync(command, {encoding:"utf8"});
+		} catch (err) {
+			logEvent(2, "GIT Error", service.dir, err);
+		}
+	}
+
 	var ls = exec('cd ' + config.base_dir + '/' + config.folders[service] + ' && git reset --hard', (error, stdout, stderr) => {
 		if (error) return logEvent(2, 'Revert error:',error);
 
 		// delete NODE_MODULES Folder if we already reverted
 		if (state[service] && state[service].npm_revert == true) {
+			logEvent(1, "NPM Revert", service);
 			var ls = exec('cd ' + config.base_dir + '/' + config.folders[service] + ' && rm -rf node_modules', (error, stdout, stderr) => {
 				logEvent(2, 'Already reverted, delete node_modules in '+service);
 
