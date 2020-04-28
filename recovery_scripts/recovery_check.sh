@@ -96,60 +96,65 @@ sisyphus_recovery_procedure(){
 	now=$(date +"%D %T")
 	echo "RECOVERY IN PROCESS: $now" >> /var/log/sisyphus/recovery.log
 
-	# Kill all running processes
-	shutdown_sis_software
+	# make sure recovery.tar.gz exists
+	if [ -f "/home/pi/sis_recovery/protected_backup/recovery.tar.gz" ]; then
+		
+		# Kill all running processes
+		shutdown_sis_software
 
-	# Remove the current directories
-	echo "Remove current directories" >> /var/log/sisyphus/recovery.log
-	rm -rf /home/pi/sisbot-server/sisbot
-	rm -rf /home/pi/sisbot-server/siscloud
-	rm -rf /home/pi/sisbot-server/sisproxy
+		# Remove the current directories
+		echo "Remove current directories" >> /var/log/sisyphus/recovery.log
+		rm -rf /home/pi/sisbot-server/sisbot
+		rm -rf /home/pi/sisbot-server/siscloud
+		rm -rf /home/pi/sisbot-server/sisproxy
 
-	# Untar the recovery files
-	echo "Untar recovery files" >> /var/log/sisyphus/recovery.log
-	cd /home/pi/sis_recovery/protected_backup
-	tar xf recovery.tar.gz -C /home/pi/sisbot-server/
+		# Untar the recovery files
+		echo "Untar recovery files" >> /var/log/sisyphus/recovery.log
+		cd /home/pi/sis_recovery/protected_backup
+		tar xf recovery.tar.gz -C /home/pi/sisbot-server/
 
-	# Copy the recovery copies into place
-	# echo "Restore sisbot" >> /var/log/sisyphus/recovery.log
-	# sudo mv /home/pi/sis_recovery/protected_backup/recovery/sisbot /home/pi/sisbot-server/ || echo "Sisbot mv error" >> /var/log/sisyphus/recovery.log
-	# echo "Restore siscloud" >> /var/log/sisyphus/recovery.log
-	# sudo mv /home/pi/sis_recovery/protected_backup/recovery/siscloud /home/pi/sisbot-server/ || echo "Siscloud mv error" >> /var/log/sisyphus/recovery.log
-	# echo "Restore sisproxy" >> /var/log/sisyphus/recovery.log
- 	# sudo mv /home/pi/sis_recovery/protected_backup/recovery/sisproxy /home/pi/sisbot-server/ || echo "Sisproxy mv error" >> /var/log/sisyphus/recovery.log
+		# Copy the recovery copies into place
+		# echo "Restore sisbot" >> /var/log/sisyphus/recovery.log
+		# sudo mv /home/pi/sis_recovery/protected_backup/recovery/sisbot /home/pi/sisbot-server/ || echo "Sisbot mv error" >> /var/log/sisyphus/recovery.log
+		# echo "Restore siscloud" >> /var/log/sisyphus/recovery.log
+		# sudo mv /home/pi/sis_recovery/protected_backup/recovery/siscloud /home/pi/sisbot-server/ || echo "Siscloud mv error" >> /var/log/sisyphus/recovery.log
+		# echo "Restore sisproxy" >> /var/log/sisyphus/recovery.log
+	 	# sudo mv /home/pi/sis_recovery/protected_backup/recovery/sisproxy /home/pi/sisbot-server/ || echo "Sisproxy mv error" >> /var/log/sisyphus/recovery.log
 
-	# Remove the status file
-	rm /home/pi/sisbot-server/sisbot/content/status.json
+		# Remove the status file
+		rm /home/pi/sisbot-server/sisbot/content/status.json
 
-	# Remove the recovery source
-	# echo "Remove recovery" >> /var/log/sisyphus/recovery.log
-	# rm -rf /home/pi/sis_recovery/protected_backup/recovery
+		# Remove the recovery source
+		# echo "Remove recovery" >> /var/log/sisyphus/recovery.log
+		# rm -rf /home/pi/sis_recovery/protected_backup/recovery
 
-	# Stop the LED flash
-	kill $pid_flash
-  sleep 0.25
-  echo $GPIO_OFF > /sys/class/gpio/gpio$GPIO_LED_RED/value
+		# Stop the LED flash
+		kill $pid_flash
+	  sleep 0.25
+	  echo $GPIO_OFF > /sys/class/gpio/gpio$GPIO_LED_RED/value
 
-	#Setup the interfaces file for hostspot mode
-	echo "Reset network interfaces" >> /var/log/sisyphus/recovery.log
-	cp /etc/network/interfaces.hotspot /etc/network/interfaces
+		#Setup the interfaces file for hostspot mode
+		echo "Reset network interfaces" >> /var/log/sisyphus/recovery.log
+		cp /etc/network/interfaces.hotspot /etc/network/interfaces
 
-	#Set the green LED
-	echo $GPIO_ON > /sys/class/gpio/gpio$GPIO_LED_GRN/value
+		#Set the green LED
+		echo $GPIO_ON > /sys/class/gpio/gpio$GPIO_LED_GRN/value
 
-	# Reset Table name
-	resetup_sis_software
+		# Reset Table name
+		resetup_sis_software
 
-	echo "RECOVERY COMPLETE" >> /var/log/sisyphus/recovery.log
-	sleep 10
+		echo "RECOVERY COMPLETE" >> /var/log/sisyphus/recovery.log
+		sleep 10
 
-	#Clear the green LED
-	echo "Green LED off" >> /var/log/sisyphus/recovery.log
-  echo $GPIO_OFF > /sys/class/gpio/gpio$GPIO_LED_GRN/value
+		#Clear the green LED
+		echo "Green LED off" >> /var/log/sisyphus/recovery.log
+	  echo $GPIO_OFF > /sys/class/gpio/gpio$GPIO_LED_GRN/value
 
-	# Reboot the Pi to restart the software
-	echo "Reboot..." >> /var/log/sisyphus/recovery.log
-	sudo reboot
+		# Reboot the Pi to restart the software
+		echo "Reboot..." >> /var/log/sisyphus/recovery.log
+		sudo reboot
+
+	fi
 }
 
 
