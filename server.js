@@ -280,11 +280,15 @@ function git_state() {
 		if (fs.existsSync(config.recovery_dir+'/protected_backup/backup_v')) {
 			try {
 				var archived_v = fs.readFileSync(config.recovery_dir+'/protected_backup/backup_v', 'utf8');
+				logEvent(1, "Backup_v found:", archived_v);
 				if (archived_v && config.recovery_v > +archived_v) update_archive = true;
 			} catch(err) {
 				logEvent(2, "backup_v error", err);
 			}
-		} else update_archive = true;
+		} else {
+			logEvent(1, "No backup_v");
+			update_archive = true;
+		}
 
 		if (update_archive) {
 			logEvent(0, "Run recovery_archiveUpdate");
