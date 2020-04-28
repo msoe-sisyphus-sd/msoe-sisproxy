@@ -84,9 +84,20 @@ _.each(config.services, function(service, key) {
 	if (service.address == 'localhost' && !fs.existsSync(service.dir+'/node_modules')) {
     logEvent(2, "Node_modules is missing in", service.dir);
 
+		// TODO: if .git/index.lock exists, delete it rm .git/index.lock
+		if (fs.existsSync(service.dir + "/.git/index.lock")) {
+			logEvent(2, "git locked, remove lock", service);
+			try {
+				var command = 'rm '+ service.dir + '/.git/index.lock';
+				execSync(command, {encoding:"utf8"});
+			} catch (err) {
+				logEvent(2, "GIT Error", service.dir, err);
+			}
+		}
+
 		// TODO: make sure network is connected first?
 		try {
-			var command = 'cd '+service.dir+' && sudo -u pi npm install';
+			var command = 'cd '+service.dir+' && git reset --hard && sudo -u pi npm install';
 			execSync(command, {encoding:"utf8"});
 
 			logEvent(1, "NPM Install finished, restart");
@@ -195,7 +206,7 @@ function reinstall_npm(service, key) {
 	logEvent(2, "NPM Restart");
 
 	// attempt to fix via npm install
-	var command = 'cd '+service.dir+' && sudo -u pi npm install && echo "Finished"';
+	var command = 'cd '+service.dir+' && git reset --hard && sudo -u pi npm install && echo "Finished"';
 	logEvent(2, command);
 	try {
 		execSync(command, {encoding:"utf8"});
