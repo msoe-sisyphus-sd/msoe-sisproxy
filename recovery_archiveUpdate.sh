@@ -24,14 +24,14 @@ mkdir -p /home/pi/sis_recovery/protected_backup/recovery
 # copy sisbot
 cp -rp /home/pi/sisbot-server/sisbot /home/pi/sis_recovery/protected_backup/recovery/sisbot
 cd /home/pi/sis_recovery/protected_backup/recovery/sisbot
-git reset --hard
-# TODO: add specific git commit value
+git reset --hard c736fbfa491b966d710b7bc42d01635455afabb6
+# 1.10.70
 
 # copy siscloud
 cp -rp /home/pi/sisbot-server/siscloud /home/pi/sis_recovery/protected_backup/recovery/siscloud
 cd /home/pi/sis_recovery/protected_backup/recovery/siscloud
-git reset --hard
-# TODO: add specific git commit value
+git reset --hard 3a89bc1a8f70c2427c7c55e1fdb633f96d745cdf
+# 1.10.25
 
 # copy sisproxy
 cp -rp /home/pi/sisbot-server/sisproxy /home/pi/sis_recovery/protected_backup/recovery/sisproxy
