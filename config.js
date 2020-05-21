@@ -210,7 +210,7 @@ var config = {
     port_ssl: 3101,
     port_redirect: 3100,
     default_domain: 'sisyphus.dev.withease.io',
-    base_dir: '/Users/curtismorice/Sites/sisyphus_master',
+    base_dir: '/Users/curtismorice/Sites/sisyphus_master/',
     base_certs: '/Users/curtismorice/Sites/sisyphus_master/sisproxy/certs/',
     folders: {
       cloud: 'app',
