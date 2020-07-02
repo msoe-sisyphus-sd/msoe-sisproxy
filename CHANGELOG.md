@@ -1,4 +1,6 @@
-# 2019-03-17 1.4.18
+# 2019-07-1 1.4.19
+ - check for networking files on startup
+ # 2019-03-17 1.4.18
  - update sis_recovery backup file if needed
 # 2019-12-17 1.4.13
  - Send error response if ansible method fails

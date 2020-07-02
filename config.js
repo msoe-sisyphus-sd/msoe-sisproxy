@@ -2,7 +2,7 @@ var _ = require('underscore');
 
 var config = {
   base: {
-    version: '1.4.18', // Recovery_update
+    version: '1.3.19', // check network files on startup
     include_https: true,
     port_ssl: 443,
     port_redirect: 80,
