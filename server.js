@@ -63,19 +63,19 @@ var logEvent = function() {
 logEvent(1, "Check networking files...");
 if (!fs.existsSync('/etc/hostapd/hostapd.conf')) {
 	logEvent(2, "hostapd.conf missing");
-	fs.copyFileSync(config.folders.proxy+'/networking/hostapd.conf', '/etc/hostapd/hostapd.conf');
+	fs.copyFileSync(config.base_dir+'/'+config.folders.proxy+'/networking/hostapd.conf', '/etc/hostapd/hostapd.conf');
 }
 if (!fs.existsSync('/etc/network/interfaces.bak')) {
 	logEvent(2, "interfaces.bak missing");
-	fs.copyFileSync(config.folders.proxy+'/networking/interfaces.bak', '/etc/network/interfaces.bak');
+	fs.copyFileSync(config.base_dir+'/'+config.folders.proxy+'/networking/interfaces.bak', '/etc/network/interfaces.bak');
 }
 if (!fs.existsSync('/etc/network/interfaces.hotspot')) {
 	logEvent(2, "interfaces.hotspot missing");
-	fs.copyFileSync(config.folders.proxy+'/networking/interfaces.hotspot', '/etc/network/interfaces.hotspot');
+	fs.copyFileSync(config.base_dir+'/'+config.folders.proxy+'/networking/interfaces.hotspot', '/etc/network/interfaces.hotspot');
 }
 if (!fs.existsSync('/etc/wpa_supplicant/wpa_supplicant.conf.bak')) {
 	logEvent(2, "wpa_supplicant.conf.bak missing");
-	fs.copyFileSync(config.folders.proxy+'/networking/wpa_supplicant.conf.bak', '/etc/wpa_supplicant/wpa_supplicant.conf.bak');
+	fs.copyFileSync(config.base_dir+'/'+config.folders.proxy+'/networking/wpa_supplicant.conf.bak', '/etc/wpa_supplicant/wpa_supplicant.conf.bak');
 }
 
 logEvent(1, "Proxy Start", process.env.NODE_ENV);
