@@ -3,6 +3,7 @@ var _ = require('underscore');
 var config = {
   base: {
     version: '1.3.19', // check network files on startup
+    is_pi: false,
     include_https: true,
     port_ssl: 443,
     port_redirect: 80,
@@ -66,6 +67,7 @@ var config = {
     }
   },
   sisbot: {
+    is_pi: true,
     include_https: false,
     default_server: 'app',
     default_domain: 'sisyphus.local',
@@ -124,6 +126,7 @@ var config = {
     }
   },
   training: {
+    is_pi: false,
     folders: {
       sisbot: 'sisbot',
       proxy: 'sisproxy',
@@ -173,40 +176,41 @@ var config = {
       }
     }
   },
-  joel: {
-    port_ssl: 3101,
-    port_redirect: 3000,
-    default_domain: 'sisyphus.dev.withease.io',
-    base_dir: '/Users/JoelS/code/sisyphus',
-    base_certs: '/Users/JoelS/code/sisyphus/sisproxy/certs',
-    folders: {
-      cloud: 'app',
-      api: 'api',
-      sisbot: 'sisbot',
-      proxy: 'proxy',
-      app: 'siscloud'
-    },
-    servers: function() {
-      return {
-        app: {
-          dir: this.base_dir + '/' + this.folders.app,
-          port: 3001,
-          has_server: true
-        }
-      }
-    },
-    services: function() {
-      return {
-        app: {
-          dir: this.base_dir + '/' + this.folders.app,
-          address: 'localhost',
-          port: 3001,
-          has_server: true
-        }
-      }
-    }
-  },
+  // joel: {
+  //   port_ssl: 3101,
+  //   port_redirect: 3000,
+  //   default_domain: 'sisyphus.dev.withease.io',
+  //   base_dir: '/Users/JoelS/code/sisyphus',
+  //   base_certs: '/Users/JoelS/code/sisyphus/sisproxy/certs',
+  //   folders: {
+  //     cloud: 'app',
+  //     api: 'api',
+  //     sisbot: 'sisbot',
+  //     proxy: 'proxy',
+  //     app: 'siscloud'
+  //   },
+  //   servers: function() {
+  //     return {
+  //       app: {
+  //         dir: this.base_dir + '/' + this.folders.app,
+  //         port: 3001,
+  //         has_server: true
+  //       }
+  //     }
+  //   },
+  //   services: function() {
+  //     return {
+  //       app: {
+  //         dir: this.base_dir + '/' + this.folders.app,
+  //         address: 'localhost',
+  //         port: 3001,
+  //         has_server: true
+  //       }
+  //     }
+  //   }
+  // },
   curtis: {
+    is_pi: false,
     port_ssl: 3101,
     port_redirect: 3100,
     default_domain: 'sisyphus.dev.withease.io',
@@ -244,6 +248,7 @@ var config = {
   },
   matt: {
     pi_serial: "0000000000000000",
+    is_pi: false,
     port_ssl: 3101,
     port_redirect: 3000,
     default_domain: 'dev.withease.io',
@@ -259,33 +264,33 @@ var config = {
     base_dir: '/Users/mattfox12/Documents/Sodo/Ease/Sisyphus',
     base_certs: '/Users/mattfox12/Documents/Sodo/Ease/Sisyphus/proxy/certs/'
   },
-  wc: {
-    services: function() {
-      return {
-        app: {
-          dir: this.base_dir + '/' + this.folders.app,
-          address: 'localhost',
-          port: 3001,
-          has_server: true
-        },
-        sisbot: {
-          dir: this.base_dir + '/' + this.folders.sisbot,
-          address: 'localhost',
-          port: 3002,
-          ansible_port: 8091,
-          connect: ['api']
-        },
-        api: {
-          address: '192.168.86.20',
-          // address: '54.237.23.209',
-          port: 3005,
-          ansible_port: 8092,
-          is_register: true,
-          connect: []
-        }
-      }
-    }
-  },
+  // wc: {
+  //   services: function() {
+  //     return {
+  //       app: {
+  //         dir: this.base_dir + '/' + this.folders.app,
+  //         address: 'localhost',
+  //         port: 3001,
+  //         has_server: true
+  //       },
+  //       sisbot: {
+  //         dir: this.base_dir + '/' + this.folders.sisbot,
+  //         address: 'localhost',
+  //         port: 3002,
+  //         ansible_port: 8091,
+  //         connect: ['api']
+  //       },
+  //       api: {
+  //         address: '192.168.86.20',
+  //         // address: '54.237.23.209',
+  //         port: 3005,
+  //         ansible_port: 8092,
+  //         is_register: true,
+  //         connect: []
+  //       }
+  //     }
+  //   }
+  // },
   debug: {
     debug: true
   },

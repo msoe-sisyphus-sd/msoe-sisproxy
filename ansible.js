@@ -65,6 +65,8 @@ var Ansible = function() {
 		connect: function(service, address, port, cb) {
 			var self = this;
 
+			self.logEvent(1, "Ansible Connect()", service, address);
+
 			// connect to another ansible service
 			var options = {
 				rejectUnauthorized:false
@@ -159,6 +161,7 @@ var Ansible = function() {
 
 			// save to list
 			if (this.sockets[service] == undefined) {
+				// this.logEvent(0, 'Ansible: new socket', service);
 				var socket_obj = {
 					socket					:	json_socket,
 					service					: service,
@@ -173,8 +176,10 @@ var Ansible = function() {
 				};
 				this.sockets[service] = socket_obj;
 			} else {
+				// self.logEvent(0, 'Ansible: reconnect socket', service);
 				self.get(service).reconnect = 0;
 				self.get(service).socket = json_socket;
+				self.get(service).maintain_conn = true;
 
 				if (self.get(service).messages.length > 0) {
 					// send those messages!
@@ -278,6 +283,8 @@ var Ansible = function() {
 
 				this.get(service).maintain_conn = false; // don't try to reconnect
 				this.get_socket(service).end();
+
+				//		delete this.get_socket(service);
 
 				this.logEvent(1, "Ansible disconnect finished", service);
 				return true;
