@@ -62,21 +62,29 @@ var logEvent = function() {
 // TODO: check to be sure needed networking files exist
 if (config.is_pi) {
 	logEvent(1, "Check networking files...");
-	if (!fs.existsSync('/etc/hostapd/hostapd.conf')) {
-		logEvent(2, "hostapd.conf missing");
-		fs.copyFileSync(config.base_dir+'/'+config.folders.proxy+'/networking/hostapd.conf', '/etc/hostapd/hostapd.conf');
-	}
-	if (!fs.existsSync('/etc/network/interfaces.bak')) {
-		logEvent(2, "interfaces.bak missing");
-		fs.copyFileSync(config.base_dir+'/'+config.folders.proxy+'/networking/interfaces.bak', '/etc/network/interfaces.bak');
-	}
-	if (!fs.existsSync('/etc/network/interfaces.hotspot')) {
-		logEvent(2, "interfaces.hotspot missing");
-		fs.copyFileSync(config.base_dir+'/'+config.folders.proxy+'/networking/interfaces.hotspot', '/etc/network/interfaces.hotspot');
-	}
-	if (!fs.existsSync('/etc/wpa_supplicant/wpa_supplicant.conf.bak')) {
-		logEvent(2, "wpa_supplicant.conf.bak missing");
-		fs.copyFileSync(config.base_dir+'/'+config.folders.proxy+'/networking/wpa_supplicant.conf.bak', '/etc/wpa_supplicant/wpa_supplicant.conf.bak');
+	var files = [
+		{path:'/etc/hostapd/hostapd.conf', name:'hostapd.conf'},
+		{path:'/etc/network/interfaces.bak', name:'interfaces.bak'},
+		{path:'/etc/network/interfaces.hotspot', name:'interfaces.hotspot'},
+		{path:'/etc/wpa_supplicant/wpa_supplicant.conf.bak', name:'wpa_supplicant.conf.bak'},
+	];
+
+	try {
+		_.each(files, function(file) {
+			if (!fs.existsSync(file.path)) {
+				logEvent(2, file.name, "missing");
+				fs.copyFileSync(config.base_dir+'/'+config.folders.proxy+'/networking/'+file.name, file.path);
+			} else { // Make sure file is not empty
+				var stats = fs.statSync(file.path);
+				var fileSizeInBytes = stats["size"];
+				if (fileSizeInBytes == 0) {
+					logEvent(2, file.name, "empty");
+					fs.copyFileSync(config.base_dir+'/'+config.folders.proxy+'/networking/'+file.name, file.path);
+				}
+			}
+		});
+	} catch(err) {
+		logEvent(2, "Networking check error", err);
 	}
 }
 
