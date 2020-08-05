@@ -1,7 +1,7 @@
 # 2019-07-1 1.4.19
  - check for networking files on startup
  - Ansible reconnect updates maintain_conn
- # 2019-03-17 1.4.18
+ # 2019-03-17 1.4.18 5c6c747dfc8bc0603e3b95d5b5dbf0355da470ab
  - update sis_recovery backup file if needed
 # 2019-12-17 1.4.13
  - Send error response if ansible method fails
