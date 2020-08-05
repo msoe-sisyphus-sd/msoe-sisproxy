@@ -2,7 +2,7 @@ var _ = require('underscore');
 
 var config = {
   base: {
-    version: '1.3.19', // check network files on startup
+    version: '1.4.19', // check network files on startup
     is_pi: false,
     include_https: true,
     port_ssl: 443,

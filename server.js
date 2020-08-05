@@ -304,7 +304,7 @@ function git_state() {
 
 		// run recovery_archiveUpdate.sh if needed
 		var update_archive = false;
-		logEvent(0, "Backup Check");
+		logEvent(1, "Backup Check");
 		// check if we need to update the archive
 		if (fs.existsSync(config.recovery_dir+'/protected_backup/backup_v')) {
 			try {
@@ -320,7 +320,7 @@ function git_state() {
 		}
 
 		if (update_archive) {
-			logEvent(0, "Run recovery_archiveUpdate");
+			logEvent(1, "Run recovery_archiveUpdate");
 			var ls = spawn('./recovery_archiveUpdate.sh',[],{cwd:config.base_dir+'/'+config.folders.proxy,detached:true,stdio:'ignore'});
 			ls.on('error', (err) => {
 			  logEvent(2, 'Failed to start recovery_archiveUpdate.');
