@@ -11,7 +11,7 @@ fi
 
 if command -v python3 >/dev/null 2>&1
 then
-	echo "starting server!"
+	echo "starting sislisten server!"
 	cd $path
 	python3 -m pip install -r requirements.txt
 	python3 server.py
