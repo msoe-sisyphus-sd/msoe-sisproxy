@@ -216,6 +216,10 @@ _.each(config.services, function (service, key) {
 	});
 });
 
+// Spawn the sislisten service
+logEvent(1, "Spawn sislisten");
+sis_listen = spawn("./start_listen.sh", );
+
 function create_service(service,cb) {
 	logEvent(1, "Create", service);
 	try {
@@ -228,10 +232,6 @@ function create_service(service,cb) {
 		logEvent(2, "Service error:", service.port, err);
 		if (cb) cb(err, null);
 	}
-
-    // Spawn the sislisten service
-    logEvent(1, "Spawn sislisten");
-    sis_listen = spawn("./start_listen.sh", );
 
 }
 
